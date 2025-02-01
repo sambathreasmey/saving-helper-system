@@ -1,6 +1,6 @@
 import datetime
 import os
-from flask import Flask, render_template, redirect, url_for, session, flash
+from flask import Flask, render_template, redirect, request, url_for, session, flash
 from flask_wtf import FlaskForm
 from wtforms import DateField, SelectField, StringField,PasswordField,SubmitField
 from wtforms.validators import DataRequired, Email
@@ -42,24 +42,27 @@ def index():
             "channel_id": "sambathreasmey"
         }
         res = RestConnector.internal_app_api('partner', 'retrive_user', req, "POST")
-        if res.status_code == 200:
-            data = res.json()
-        if data:
-            users = data['data']
-            user_detail = None
-            for user in users:
-                if user['user_name'] == user_id:
-                    user_detail = user
-        
-            req = {
-                "channel_id": "sambathreasmey"
-            }
-            res = RestConnector.internal_app_api('saving', 'transaction_detail', req, "POST")
+        if res:
             if res.status_code == 200:
                 data = res.json()
-            if data:
-                txn_details = data['data']
-            return render_template('index.html', total_user=len(users), txn_details=txn_details)
+                if data:
+                    users = data['data']
+                    user_detail = None
+                    for user in users:
+                        if user['user_name'] == user_id:
+                            user_detail = user
+                
+                    req = {
+                        "channel_id": "sambathreasmey"
+                    }
+                    res = RestConnector.internal_app_api('saving', 'transaction_detail', req, "POST")
+                    if res.status_code == 200:
+                        data = res.json()
+                        if data:
+                            txn_details = data['data']
+                        return render_template('index.html', total_user=len(users), txn_details=txn_details)
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        return redirect(url_for('login'))
     return redirect(url_for('login'))
 
 @app.route('/saving_deport', methods=['GET','POST'])
@@ -81,13 +84,16 @@ def saving_deport():
                 "channel_id": "sambathreasmey"
             }
             resp = RestConnector.internal_app_api('saving', 'deposit', req, "POST")
-            if resp.status_code == 200:
-                data = resp.json()
-            if data and data['status'] == 0:
-                return redirect(url_for('saving_deport'))
-            else:
-                flash(data['message'])
-                return redirect(url_for('saving_deport'))
+            if resp:
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data and data['status'] == 0:
+                        return redirect(url_for('saving_deport'))
+                    else:
+                        flash(data['message'])
+                        return redirect(url_for('saving_deport'))
+            flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+            return redirect(url_for('login'))
         return render_template('saving_deport.html', form=form)
     return redirect(url_for('login'))
 
@@ -99,7 +105,31 @@ def delete_transaction_by_id(transaction_id):
             "channel_id": "sambathreasmey"
         }
         resp = RestConnector.internal_app_api('saving', 'delete_transaction_by_id', req, "DELETE")
-        return resp.json()
+        if resp:
+            if resp.status_code == 200:
+                return resp.json()
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        return redirect(url_for('login'))
+    return redirect(url_for('login'))
+
+@app.route('/update_transaction_by_id/<string:transaction_id>', methods=['PUT'])
+def update_transaction_by_id(transaction_id):
+    if 'user_id' in session:
+        req = {
+            "transaction_id": transaction_id,
+            "transaction_date": request.json.get("transaction_date"),
+            "amount": request.json.get("amount"),
+            "transaction_desc": request.json.get("transaction_desc"),
+            "currency_type": request.json.get("currency_type"),
+            "transaction_type": "normal",
+            "channel_id": "sambathreasmey"
+        }
+        resp = RestConnector.internal_app_api('saving', 'update_transaction_by_id', req, "PUT")
+        if resp:
+            if resp.status_code == 200:
+                return resp.json()
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        return redirect(url_for('login'))
     return redirect(url_for('login'))
 
 @app.route('/report')
@@ -109,11 +139,14 @@ def report():
                 "channel_id": "sambathreasmey"
             }
         res = RestConnector.internal_app_api('saving', 'transaction_detail', req, "POST")
-        if res.status_code == 200:
-            data = res.json()
-        if data:
-            txn_details = data['data']  # Fetch all users from the database
-            return render_template('report.html', txn_details=txn_details)
+        if res:
+            if res.status_code == 200:
+                data = res.json()
+                if data:
+                    txn_details = data['data']  # Fetch all users from the database
+                    return render_template('report.html', txn_details=txn_details)
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        return redirect(url_for('login'))
     return redirect(url_for('login'))
 
 @app.route('/register',methods=['GET','POST'])
@@ -133,13 +166,16 @@ def register():
         "status": 1
         }
         res = RestConnector.internal_app_api('partner', 'add_user', req, "POST")
-        if res.status_code == 200:
-            data = res.json()
-        if data and data['status'] == 0:
-            return redirect(url_for('login'))
-        else:
-            flash(data['message'])
-            return redirect(url_for('register'))
+        if res:
+            if res.status_code == 200:
+                data = res.json()
+                if data and data['status'] == 0:
+                    return redirect(url_for('login'))
+                else:
+                    flash(data['message'])
+                    return redirect(url_for('register'))
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        return redirect(url_for('login'))
 
     return render_template('register.html',form=form)
 
@@ -169,42 +205,10 @@ def login():
 
     return render_template('login.html',form=form)
 
-@app.route('/dashboard')
-def dashboard():
-    if 'user_id' in session:
-        user_id = session['user_id']
-
-        req = {
-            "channel_id": "sambathreasmey",
-            "user_name": user_id
-        }
-        res = RestConnector.internal_app_api('partner', 'get_user_details', req, "POST")
-        if res.status_code == 200:
-            data = res.json()
-        if data:
-            return render_template('dashboard.html',user=data['data'][0])
-            
-    return redirect(url_for('login'))
-
-@app.route('/user_list')
-def user_list():
-    req = {
-            "channel_id": "sambathreasmey"
-        }
-    res = RestConnector.internal_app_api('partner', 'retrive_user', req, "POST")
-    if res.status_code == 200:
-        data = res.json()
-    if data:
-        users = data['data']  # Fetch all users from the database
-        return render_template('user_list.html', users=users)
-
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
     return redirect(url_for('login'))
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)

@@ -20,7 +20,7 @@
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">ប្រតិបត្តិការណ៍ទូទៅ</h5>
+              <h5 class="card-title">ប្រតិបត្តិការទូទៅ</h5>
               <!-- <p>នេះគឺជាប្រតិបត្តិការណ៍ទូទៅ យើងអាចស្វែងរកទិន្នន័យលំអិល និងធ្វើការកែប្រែទិន្នន័យបានយ៉ាងងាយស្រួល ក្នុងករណីរបាយការណ៍ទិន្នន័យរបស់អ្នកបញ្ចូលខុសប្រក្រតី</p> -->
 
               <!-- Table with stripped rows -->
@@ -36,7 +36,7 @@
                             <th>ប្រភេទសាច់ប្រាក់</th>
                             <th data-type="date" data-format="YYYY/DD/MM">កាលបរិច្ឆេទបញ្ជូល</th>
                             <th>កំណត់សម្គាល់</th>
-                            <th>Actions</th> <!-- New column for actions -->
+                            <th>កំណត់</th> <!-- New column for actions -->
                         </tr>
                     </thead>
                     <tbody>
@@ -49,14 +49,14 @@
                             <td>{{ txn_detail.created_on }}</td>
                             <td>{{ txn_detail.transaction_desc }}</td>
                             <td>
-                                <a href="#" class="btn btn-primary btn-sm btn-edit" 
+                                <a href="#" class="btn btn-primary btn-edit" 
                                 data-id="{{ txn_detail.transaction_id }}"
                                 data-amount="{{ txn_detail.amount }}"
                                 data-transaction_date="{{ txn_detail.transaction_date }}"
                                 data-currency_type="{{ txn_detail.currency_type }}"
                                 data-transaction_desc="{{ txn_detail.transaction_desc }}"
-                                >Edit</a>
-                                <a href="#" class="btn btn-danger btn-sm" onclick="deleteTransaction('{{ txn_detail.transaction_id }}'); return false;">Delete</a>
+                                ><i class="bi bi-pencil-square"></i></a>
+                                <a href="#" class="btn btn-danger" onclick="deleteTransaction('{{ txn_detail.transaction_id }}'); return false;"><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         {% else %}
@@ -81,26 +81,30 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editTransactionModalLabel">Edit Transaction</h5>
+                <h5 class="modal-title" id="editTransactionModalLabel">កែប្រែប្រតិបត្តិការ</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="editTransactionForm">
                     <input type="hidden" name="transaction_id" id="transaction_id">
                     <div class="mb-3">
-                        <label for="transaction_date" class="form-label">Transaction Date</label>
+                        <label for="transaction_date" class="form-label">កាលបរិច្ឆេទ</label>
                         <input type="date" class="form-control" id="transaction_date" name="transaction_date" required>
                     </div>
                     <div class="mb-3">
-                        <label for="amount" class="form-label">Amount</label>
+                        <label for="amount" class="form-label">ចំនូនទឹកប្រាក់</label>
                         <input type="number" class="form-control" id="amount" name="amount" required>
                     </div>
                     <div class="mb-3">
-                        <label for="currency_type" class="form-label">Currency Type</label>
-                        <input type="text" class="form-control" id="currency_type" name="currency_type" required>
+                        <label for="currency_type" class="form-label">ប្រភេទសាច់ប្រាក់</label>
+                        <select class="form-control" id="currency_type" name="currency_type" required>
+                            <option value="" disabled selected>Select Currency</option>
+                            <option value="USD">USD</option>
+                            <option value="KHR">KHR</option>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="transaction_desc" class="form-label">Description</label>
+                        <label for="transaction_desc" class="form-label">កំណត់សម្គាល់</label>
                         <textarea class="form-control" id="transaction_desc" name="transaction_desc"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Transaction</button>
@@ -172,16 +176,41 @@
 
         document.getElementById('editTransactionForm').addEventListener('submit', async function(event) {
             event.preventDefault();
-            const formData = new FormData(this);
-            const response = await fetch(`/update_transaction`, {
-                method: 'POST',
-                body: formData
-            });
-            if (response.ok) {
-                alert('Transaction updated successfully.');
-                location.reload();
+            
+            // Get the transaction ID from a hidden input field or another source
+            const transactionIdInput = document.getElementById('transaction_id');
+            if (transactionIdInput) {
+                const transactionId = transactionIdInput.value;
+                
+                // Create a JSON object from the form data
+                const formData = new FormData(this);
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+
+                // Send the PUT request to the correct endpoint
+                const response = await fetch(`/update_transaction_by_id/${transactionId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json' // Set the content type to JSON
+                    },
+                    body: JSON.stringify(data) // Convert the data to JSON
+                });
+
+                if (response.ok) {
+                    const jsonResponse = await response.json(); // Await the JSON response
+                    if (jsonResponse.status === 0) { // Check the status in the JSON response
+                        alert(jsonResponse.message); // Show the success message
+                    } else {
+                        alert(jsonResponse.message); // Show the error message
+                    }
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert('Failed to update transaction.');
+                }
             } else {
-                alert('Failed to update transaction.');
+                alert('Transaction ID not found.');
             }
         });
     });
