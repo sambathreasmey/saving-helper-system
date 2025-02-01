@@ -1,0 +1,64 @@
+{% extends 'header.html' %}
+{% block content %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Saving Deposit</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item">គ្រប់គ្រង</li>
+          <li class="breadcrumb-item active">បញ្ចូលទឹកប្រាក់សន្សំ</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+    <section class="section">
+      <div class="row">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">បញ្ចូលទឹកប្រាក់សន្សំ</h5>
+
+              <!-- Floating Labels Form -->
+              <form class="row g-3" action="/saving_deport" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="col-md-6">
+                  <div class="col-md-12">
+                    <div class="form-floating">
+                      {{ form.amount(id="amount", class="form-control", placeholder="Amount") }}
+                      {{ form.amount.label(for="amount", class="form-label") }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating mb-3">
+                      {{ form.currencyType(class="form-select", id="currencyType", aria_label="Currency Type") }}
+                      {{ form.currencyType.label(for="currencyType", class="form-label") }}
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating mb-3">
+                      {{ form.date(class="form-control", id="date", aria_label="Date") }}
+                      {{ form.date.label(for="date", class="form-label") }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="col-md-12">
+                    <div class="form-floating">
+                      {{ form.desc(id="desc", class="form-control", placeholder="Desc") }}
+                      {{ form.desc.label(for="desc", class="form-label") }}
+                    </div>
+                  </div>
+                </div>
+                <div class="item-right">
+                  {{ form.submit(class="btn btn-primary") }}
+                  <button type="reset" class="btn btn-secondary">សម្អាត</button>
+                </div>
+              </form><!-- End floating Labels Form -->
+
+            </div>
+          </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+{% endblock %}

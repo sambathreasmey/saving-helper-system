@@ -1,0 +1,13 @@
+
+<div class="container">
+  <h2>Welcome to the Dashboard</h2>
+
+    {% if user %}
+        <p>user information</p>
+        <ul>
+            <li>Name : {{ user['user_name'] }}</li>
+            <li>Email : {{ user['email_address'] }}</li>
+        </ul>
+        <a href="/logout" class="btn btn-dark">Logout</a>
+    {% endif %}
+</div>

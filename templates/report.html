@@ -1,0 +1,191 @@
+{% extends 'header.html' %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Transaction Report</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item">របាយការណ៍ទូទៅ</li>
+          <li class="breadcrumb-item active">របាយការណ៍</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">ប្រតិបត្តិការណ៍ទូទៅ</h5>
+              <!-- <p>នេះគឺជាប្រតិបត្តិការណ៍ទូទៅ យើងអាចស្វែងរកទិន្នន័យលំអិល និងធ្វើការកែប្រែទិន្នន័យបានយ៉ាងងាយស្រួល ក្នុងករណីរបាយការណ៍ទិន្នន័យរបស់អ្នកបញ្ចូលខុសប្រក្រតី</p> -->
+
+              <!-- Table with stripped rows -->
+              <div class="table-responsive">
+                <table class="table datatable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <b>លេខសំគាល់</b>
+                            </th>
+                            <th data-type="date" data-format="YYYY/DD/MM">កាលបរិច្ឆេទ</th>
+                            <th>ចំនូនទឹកប្រាក់</th>
+                            <th>ប្រភេទសាច់ប្រាក់</th>
+                            <th data-type="date" data-format="YYYY/DD/MM">កាលបរិច្ឆេទបញ្ជូល</th>
+                            <th>កំណត់សម្គាល់</th>
+                            <th>Actions</th> <!-- New column for actions -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for txn_detail in txn_details %}
+                        <tr>
+                            <td>{{ txn_detail.transaction_id }}</td>
+                            <td>{{ txn_detail.transaction_date }}</td>
+                            <td>{{ txn_detail.amount }}</td>
+                            <td>{{ txn_detail.currency_type }}</td>
+                            <td>{{ txn_detail.created_on }}</td>
+                            <td>{{ txn_detail.transaction_desc }}</td>
+                            <td>
+                                <a href="#" class="btn btn-primary btn-sm btn-edit" 
+                                data-id="{{ txn_detail.transaction_id }}"
+                                data-amount="{{ txn_detail.amount }}"
+                                data-transaction_date="{{ txn_detail.transaction_date }}"
+                                data-currency_type="{{ txn_detail.currency_type }}"
+                                data-transaction_desc="{{ txn_detail.transaction_desc }}"
+                                >Edit</a>
+                                <a href="#" class="btn btn-danger btn-sm" onclick="deleteTransaction('{{ txn_detail.transaction_id }}'); return false;">Delete</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center no-users">No transaction found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+              <!-- End Table with stripped rows -->
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Edit Transaction Modal -->
+<div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTransactionModalLabel">Edit Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTransactionForm">
+                    <input type="hidden" name="transaction_id" id="transaction_id">
+                    <div class="mb-3">
+                        <label for="transaction_date" class="form-label">Transaction Date</label>
+                        <input type="date" class="form-control" id="transaction_date" name="transaction_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount</label>
+                        <input type="number" class="form-control" id="amount" name="amount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="currency_type" class="form-label">Currency Type</label>
+                        <input type="text" class="form-control" id="currency_type" name="currency_type" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="transaction_desc" class="form-label">Description</label>
+                        <textarea class="form-control" id="transaction_desc" name="transaction_desc"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Transaction</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+  </main><!-- End #main -->
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const label = document.querySelector('label');
+        if (label) {
+            label.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node.remove();
+                }
+            });
+        }
+    });
+
+    async function deleteTransaction(transactionId) {
+        const userConfirmed = confirm('Are you sure you want to delete this transaction?');
+        if (!userConfirmed) return;
+        try {
+            const response = await fetch(`/delete_transaction_by_id/${transactionId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Error ${response.status}: ${errorData.message || 'Failed to delete transaction.'}`);
+            }
+            const data = await response.json();
+            if (data.status === 0) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+            alert('An error occurred while trying to delete the transaction. Please try again.'); // User-friendly error message
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.btn-edit');
+        editButtons.forEach(button => {
+            button.addEventListener('click', async function() {
+                const transactionId = this.getAttribute('data-id');
+                const amount = this.getAttribute('data-amount');
+                const transaction_date = this.getAttribute('data-transaction_date');
+                const currency_type = this.getAttribute('data-currency_type');
+                const transaction_desc = this.getAttribute('data-transaction_desc');
+                document.getElementById('transaction_id').value = transactionId;
+                document.getElementById('transaction_date').value = transaction_date;
+                document.getElementById('amount').value = amount;
+                document.getElementById('currency_type').value = currency_type;
+                document.getElementById('transaction_desc').value = transaction_desc;
+                $('#editTransactionModal').modal('show');
+            });
+        });
+
+        document.getElementById('editTransactionForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch(`/update_transaction`, {
+                method: 'POST',
+                body: formData
+            });
+            if (response.ok) {
+                alert('Transaction updated successfully.');
+                location.reload();
+            } else {
+                alert('Failed to update transaction.');
+            }
+        });
+    });
+
+  </script>
+
+{% endblock %}
