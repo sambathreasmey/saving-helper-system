@@ -36,6 +36,7 @@
                             <th>ប្រភេទសាច់ប្រាក់</th>
                             <th data-type="date" data-format="YYYY/DD/MM">កាលបរិច្ឆេទបញ្ជូល</th>
                             <th>កំណត់សម្គាល់</th>
+                            <th>ប្រភេទប្រតិបត្តិការ</th>
                             <th>កំណត់</th> <!-- New column for actions -->
                         </tr>
                     </thead>
@@ -48,6 +49,7 @@
                             <td>{{ txn_detail.currency_type }}</td>
                             <td>{{ txn_detail.created_on }}</td>
                             <td>{{ txn_detail.transaction_desc }}</td>
+                            <td>{{ txn_detail.transaction_type }}</td>
                             <td>
                                 <a href="#" class="btn btn-primary btn-edit" 
                                 data-id="{{ txn_detail.transaction_id }}"
@@ -55,6 +57,7 @@
                                 data-transaction_date="{{ txn_detail.transaction_date }}"
                                 data-currency_type="{{ txn_detail.currency_type }}"
                                 data-transaction_desc="{{ txn_detail.transaction_desc }}"
+                                data-transaction_type="{{ txn_detail.transaction_type }}"
                                 ><i class="bi bi-pencil-square"></i></a>
                                 <a href="#" class="btn btn-danger" onclick="deleteTransaction('{{ txn_detail.transaction_id }}'); return false;"><i class="bi bi-trash"></i></a>
                             </td>
@@ -106,6 +109,14 @@
                     <div class="mb-3">
                         <label for="transaction_desc" class="form-label">កំណត់សម្គាល់</label>
                         <textarea class="form-control" id="transaction_desc" name="transaction_desc"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="transaction_type" class="form-label">ប្រភេទប្រតិបត្តិការ</label>
+                        <select class="form-control" id="transaction_type" name="transaction_type" required>
+                            <option value="" disabled selected>ជ្រើសរើសប្រភេទប្រតិបត្តិការ</option>
+                            <option value="saving_deposit">saving_deposit</option>
+                            <option value="saving_deposit_more">saving_deposit_more</option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Transaction</button>
                 </form>
@@ -165,11 +176,13 @@
                 const transaction_date = this.getAttribute('data-transaction_date');
                 const currency_type = this.getAttribute('data-currency_type');
                 const transaction_desc = this.getAttribute('data-transaction_desc');
+                const transaction_type = this.getAttribute('data-transaction_type');
                 document.getElementById('transaction_id').value = transactionId;
                 document.getElementById('transaction_date').value = transaction_date;
                 document.getElementById('amount').value = amount;
                 document.getElementById('currency_type').value = currency_type;
                 document.getElementById('transaction_desc').value = transaction_desc;
+                document.getElementById('transaction_type').value = transaction_type;
                 $('#editTransactionModal').modal('show');
             });
         });

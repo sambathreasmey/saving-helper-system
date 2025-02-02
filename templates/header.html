@@ -211,13 +211,13 @@
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             <img src="../static/img/profile-img.jpg" alt="Profile" class="rounded-circle">
-            <span class="d-none d-md-block dropdown-toggle ps-2">Admin</span>
+            <span class="d-none d-md-block dropdown-toggle ps-2" id="profile_full_name">Admin</span>
           </a><!-- End Profile Iamge Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>Admin</h6>
-              <span>administrator</span>
+              <h6 id="profile_user_name">Admin</h6>
+              <span id="profile_user_email">administrator</span>
             </li>
             <li>
               <hr class="dropdown-divider">
@@ -256,7 +256,7 @@
             <li>
               <a class="dropdown-item d-flex align-items-center" href="/logout">
                 <i class="bi bi-box-arrow-right"></i>
-                <span>Sign Out</span>
+                <span>ចាកចេញ</span>
               </a>
             </li>
 
@@ -311,23 +311,23 @@
       <li class="nav-heading">Pages</li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-faq.html">
+        <a class="nav-link collapsed" href="/">
           <i class="bi bi-question-circle"></i>
           <span>F.A.Q</span>
         </a>
       </li><!-- End F.A.Q Page Nav -->
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-contact.html">
+        <a class="nav-link collapsed" href="/">
           <i class="bi bi-envelope"></i>
-          <span>Contact</span>
+          <span>ទំនាក់ទំនង</span>
         </a>
       </li><!-- End Contact Page Nav -->
 
       <li class="nav-item">
         <a class="nav-link collapsed" href="/logout">
           <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
+          <span>ចាកចេញ</span>
         </a>
       </li><!-- End Login Page Nav -->
 
@@ -349,7 +349,7 @@
       <!-- You can delete the links only if you purchased the pro version. -->
       <!-- Licensing information: https://bootstrapmade.com/license/ -->
       <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-      Designed by <a href="https://bootstrapmade.com/">Sambath Reasmey</a>
+      @រក្សាសិទ្ធិគ្រប់យ៉ាងដោយ <a href="https://www.youtube.com/@brosmeyofficial">សម្បត្តិ រស្មី</a>
     </div>
   </footer><!-- End Footer -->
 
@@ -369,5 +369,26 @@
   <script src="../static/js/main.js"></script>
 
 </body>
-
+<script>
+  window.onload = function() {
+    fetch('/onload')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        const profile_full_name = document.getElementById('profile_full_name');
+        const profile_user_name = document.getElementById('profile_user_name');
+        const profile_user_email = document.getElementById('profile_user_email');
+        profile_full_name.innerHTML = data.user_detail.full_name;
+        profile_user_name.innerHTML = data.user_detail.user_name;
+        profile_user_email.innerHTML = data.user_detail.email_address;
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+      });
+  };
+</script>
 </html>

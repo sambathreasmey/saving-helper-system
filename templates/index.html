@@ -108,7 +108,7 @@
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">ចំនួនអ្នកប្រើប្រាស់ <span>| ទាំងអស់</span></h5>
+                  <h5 class="card-title">អ្នកប្រើប្រាស់ <span>| ទាំងអស់</span></h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
@@ -231,21 +231,19 @@
                   <table class="table table-borderless datatable">
                     <thead>
                       <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Status</th>
+                        <th scope="col">កាលបរិច្ឆេទ</th>
+                        <th scope="col">ចំនូនទឹកប្រាក់</th>
+                        <th scope="col">ស្ថានភាព</th>
+                        <th scope="col">បរិយាយ</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for txn_detail in txn_details %}
                       <tr>
-                        <th scope="row"><a href="#">{{ txn_detail.transaction_id }}</a></th>
                         <td>{{ txn_detail.transaction_date }}</td>
-                        <td><a href="#" class="text-primary">{{ txn_detail.transaction_desc }}</a></td>
-                        <td>{{ txn_detail.amount }} {{ txn_detail.currency_type }}</td>
+                        <td><b>{{ txn_detail.amount }}</b> <span class="badge bg-info">{{ txn_detail.currency_type }}</span></td>
                         <td><span class="badge bg-success">Approved</span></td>
+                        <td><a href="" class="text-primary">{{ txn_detail.transaction_desc }}</a></td>
                       </tr>
                       {% else %}
                         <tr>

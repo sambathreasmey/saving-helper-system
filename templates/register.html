@@ -70,34 +70,30 @@
                         </div>
                     {% endif %}
                     {% endwith %}
-                    <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
-                    <p class="text-center small">Enter your personal details to create account</p>
+                    <h5 class="card-title text-center pb-0 fs-4">បង្កើតគណនី</h5>
+                    <p class="text-center small">បញ្ចូលព័ត៌មានលម្អិតផ្ទាល់ខ្លួនរបស់អ្នកដើម្បីបង្កើតគណនី</p>
                   </div>
 
                   <form class="row g-3 needs-validation" novalidate action="/register" method="POST">
                     {{ form.hidden_tag() }}
                     <div class="col-12">
-                      <label for="yourName" class="form-label">Your Name</label>
-                      <input type="text" name="name" class="form-control" id="yourName" required>
-                      <div class="invalid-feedback">Please, enter your name!</div>
+                      {{ form.full_name.label(for="full_name", class="form-label") }}
+                      {{ form.full_name(id="full_name", class="form-control") }}
+                      <div class="invalid-feedback">សូមបញ្ចូលឈ្មោះពេញរបស់អ្នក!</div>
                     </div>
 
                     <div class="col-12">
                         {{ form.email_address.label(for="email_address", class="form-label") }}
-                      <!-- <label for="yourEmail" class="form-label">Your Email</label> -->
                         {{ form.email_address(id="email_address", class="form-control") }}
-                      <!-- <input type="email" name="email" class="form-control" id="yourEmail" required> -->
-                      <div class="invalid-feedback">Please enter a valid Email adddress!</div>
+                      <div class="invalid-feedback">សូមបញ្ចូលអាសយដ្ឋានអ៊ីមែលត្រឹមត្រូវ!</div>
                     </div>
 
                     <div class="col-12">
                         {{ form.user_name.label(for="user_name", class="form-label") }}
-                      <!-- <label for="yourUsername" class="form-label">Username</label> -->
                       <div class="input-group has-validation">
                         <span class="input-group-text" id="inputGroupPrepend">@</span>
                         {{ form.user_name(id="user_name", class="form-control") }}
-                        <!-- <input type="text" name="username" class="form-control" id="yourUsername" required> -->
-                        <div class="invalid-feedback">Please choose a username.</div>
+                        <div class="invalid-feedback">សូមបញ្ចូលឈ្មោះអ្នកប្រើ!</div>
                       </div>
                     </div>
 
@@ -106,7 +102,7 @@
                       <!-- <label for="yourPassword" class="form-label">Password</label> -->
                         {{ form.password(id="password", class="form-control") }}
                       <!-- <input type="password" name="password" class="form-control" id="yourPassword" required> -->
-                      <div class="invalid-feedback">Please enter your password!</div>
+                      <div class="invalid-feedback">សូមពាក្យសម្ងាត់របស់អ្នក!</div>
                     </div>
 
                     <div class="col-12">
@@ -121,7 +117,7 @@
                       <!-- <button class="btn btn-primary w-100" type="submit">Create Account</button> -->
                     </div>
                     <div class="col-12">
-                      <p class="small mb-0">Already have an account? <a href="/login">Log in</a></p>
+                      <p class="small mb-0">មានគណនីរួចហើយ? <a href="/login">ចូលគណនី</a></p>
                     </div>
                   </form>
 
@@ -133,7 +129,7 @@
                 <!-- You can delete the links only if you purchased the pro version. -->
                 <!-- Licensing information: https://bootstrapmade.com/license/ -->
                 <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-                Designed by <a href="https://bootstrapmade.com/">Sambath Reasmey</a>
+                @រក្សាសិទ្ធិគ្រប់យ៉ាងដោយ <a href="https://www.youtube.com/@brosmeyofficial">សម្បត្តិ រស្មី</a>
               </div>
 
             </div>
