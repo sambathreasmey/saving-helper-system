@@ -44,7 +44,7 @@
                       <i class="bi bi-currency-dollar animated-icon"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>${{ txn_details | length }}</h6>
+                      <h6>${{ txn_details | selectattr('transaction_type', 'equalto', 'loan') | sum(attribute='amount') - txn_details | selectattr('transaction_type', 'equalto', 'loan_repay') | sum(attribute='amount') }}</h6>
                       <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">កើនឡើង</span>
 
                     </div>
@@ -79,7 +79,7 @@
                       <i class="bi bi-piggy-bank animated-icon"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>${{ txn_details | sum(attribute='amount') }}</h6>
+                      <h6>${{ txn_details | selectattr('transaction_type', 'in', ['saving_deposit', 'saving_deposit_more']) | sum(attribute='amount') }}</h6>
                       <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">កើនឡើង</span>
 
                     </div>
@@ -115,7 +115,7 @@
                       <i class="bi bi-credit-card-2-back animated-icon"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>{{ total_user }}</h6>
+                      <h6>${{ (txn_details | selectattr('transaction_type', 'in', ['saving_deposit', 'saving_deposit_more']) | sum(attribute='amount')) - (txn_details | selectattr('transaction_type', 'equalto', 'loan') | sum(attribute='amount') - txn_details | selectattr('transaction_type', 'equalto', 'loan_repay') | sum(attribute='amount')) }}</h6>
                       <span class="text-success small pt-1 fw-bold">10%</span> <span class="text-muted small pt-2 ps-1">កើនឡើង</span>
 
                     </div>
@@ -154,13 +154,13 @@
                       new ApexCharts(document.querySelector("#reportsChart"), {
                         series: [{
                           name: 'កម្ចី',
-                          data: [0, 12, 0, 34, 1, 2, '{{ txn_details | length }}'],
+                          data: [0, 12, 0, 34, 1, 2, "{{ txn_details | selectattr('transaction_type', 'equalto', 'loan') | sum(attribute='amount') - txn_details | selectattr('transaction_type', 'equalto', 'loan_repay') | sum(attribute='amount') }}"],
                         }, {
                           name: 'សន្សំ',
-                          data: [11, 32, 45, 32, 34, 52, "{{ txn_details | sum(attribute='amount') }}"]
+                          data: [11, 32, 45, 32, 34, 52, "{{ txn_details | selectattr('transaction_type', 'in', ['saving_deposit', 'saving_deposit_more']) | sum(attribute='amount') }}"]
                         }, {
                           name: 'សមតុល្យ',
-                          data: [0, 28, 14, 31, 22, 45, "{{ txn_details | sum(attribute='amount') - txn_details | length }}"]
+                          data: [0, 28, 14, 31, 22, 45, "{{ (txn_details | selectattr('transaction_type', 'in', ['saving_deposit', 'saving_deposit_more']) | sum(attribute='amount')) - (txn_details | selectattr('transaction_type', 'equalto', 'loan') | sum(attribute='amount') - txn_details | selectattr('transaction_type', 'equalto', 'loan_repay') | sum(attribute='amount')) }}"]
                         }],
                         chart: {
                           height: 350,
@@ -320,15 +320,15 @@
                         show: false
                       },
                       data: [{
-                          value: '{{ txn_details | length }}',
+                          value: "{{ txn_details | selectattr('transaction_type', 'equalto', 'loan') | sum(attribute='amount') - txn_details | selectattr('transaction_type', 'equalto', 'loan_repay') | sum(attribute='amount') }}",
                           name: 'កម្ចី'
                         },
                         {
-                          value: "{{ txn_details | sum(attribute='amount') }}",
+                          value: "{{ txn_details | selectattr('transaction_type', 'in', ['saving_deposit', 'saving_deposit_more']) | sum(attribute='amount') }}",
                           name: 'សន្សំ'
                         },
                         {
-                          value: "{{ txn_details | sum(attribute='amount') - txn_details | length }}",
+                          value: "{{ (txn_details | selectattr('transaction_type', 'in', ['saving_deposit', 'saving_deposit_more']) | sum(attribute='amount')) - (txn_details | selectattr('transaction_type', 'equalto', 'loan') | sum(attribute='amount') - txn_details | selectattr('transaction_type', 'equalto', 'loan_repay') | sum(attribute='amount')) }}",
                           name: 'សមតុល្យ'
                         },
                         {

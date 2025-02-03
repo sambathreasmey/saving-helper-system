@@ -3,12 +3,12 @@
 <main id="main" class="main">
 
     <div class="pagetitle">
-        <h1>Transaction Report</h1>
+        <h1>General Transaction Report</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Home</a></li>
-                <li class="breadcrumb-item">របាយការណ៍ទូទៅ</li>
-                <li class="breadcrumb-item active">របាយការណ៍</li>
+                <li class="breadcrumb-item">របាយការណ៍</li>
+                <li class="breadcrumb-item active">របាយការណ៍ទូទៅ</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
@@ -124,8 +124,10 @@
                         <div class="form-floating mb-3">
                             <select class="form-select" id="transaction_type" name="transaction_type" required>
                                 <option value="" disabled selected>ជ្រើសរើសប្រភេទប្រតិបត្តិការ</option>
-                                <option value="saving_deposit">saving_deposit</option>
-                                <option value="saving_deposit_more">saving_deposit_more</option>
+                                <option value="saving_deposit">សន្សំ</option>
+                                <option value="saving_deposit_more">សន្សំបន្ថែម</option>
+                                <option value="loan">កម្ចី</option>
+                                <option value="loan_repay">សងប្រាក់កម្ចី</option>
                             </select>
                             <label for="transaction_type">ប្រភេទប្រតិបត្តិការ</label>
                         </div>

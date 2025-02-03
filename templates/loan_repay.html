@@ -1,0 +1,98 @@
+{% extends 'header.html' %}
+{% block content %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Loan Repay</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item">គ្រប់គ្រង</li>
+          <li class="breadcrumb-item active">សងប្រាក់កម្ចី</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+    
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">សងប្រាក់កម្ចី</h5>
+
+              <!-- Alert Messages -->
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+
+              <!-- Loading Indicator -->
+              <div id="loading" class="d-none">
+                  <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <p>Please wait...</p>
+              </div>
+
+              <!-- Floating Labels Form -->
+              <form class="row g-3" action="/loan_repay" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="col-md-6">
+                  <div class="col-md-12">
+                    <div class="form-floating">
+                      {{ form.amount(id="amount", class="form-control", placeholder="Amount") }}
+                      {{ form.amount.label(for="amount", class="form-label") }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating mb-3">
+                      {{ form.currencyType(class="form-select", id="currencyType", aria_label="Currency Type") }}
+                      {{ form.currencyType.label(for="currencyType", class="form-label") }}
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating mb-3">
+                      {{ form.date(class="form-control", id="date", aria_label="Date") }}
+                      {{ form.date.label(for="date", class="form-label") }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="col-md-12">
+                    <div class="form-floating">
+                      {{ form.desc(id="desc", class="form-control", placeholder="Desc") }}
+                      {{ form.desc.label(for="desc", class="form-label") }}
+                    </div>
+                  </div>
+                </div>
+                <div class="item-right">
+                  <button type="reset" class="btn btn-secondary">សម្អាត</button>
+                  {{ form.submit(class="btn btn-primary animated-button") }}
+                </div>
+              </form><!-- End floating Labels Form -->
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+  
+  <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const form = document.querySelector("form");
+          const loadingIndicator = document.getElementById("loading");
+
+          form.addEventListener("submit", function() {
+              loadingIndicator.classList.remove("d-none"); // Show loading indicator
+          });
+      });
+  </script>
+{% endblock %}

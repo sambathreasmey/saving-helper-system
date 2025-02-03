@@ -31,6 +31,20 @@ class SavingDepositForm(FlaskForm):
     isMoreDeposit = BooleanField("បន្ថែមលើប្រតិបត្តិចាស់ក្នុងថ្ងៃ")
     submit = SubmitField("បញ្ចូល")
 
+class LoanForm(FlaskForm):
+    amount = StringField("ទំហំសាច់ប្រាក់", validators=[DataRequired()])
+    currencyType = SelectField('ប្រភេទសាច់ប្រាក់', choices=[('USD', 'USD'), ('USD', 'KHR')])
+    date = DateField('កាលបរិច្ឆេទ', format='%Y-%m-%d', default=datetime.date.today, validators=[DataRequired()])
+    desc = StringField("មូលហេតុ")
+    submit = SubmitField("បញ្ចូល")
+
+class LoanRepayForm(FlaskForm):
+    amount = StringField("ទំហំសាច់ប្រាក់សង", validators=[DataRequired()])
+    currencyType = SelectField('ប្រភេទសាច់ប្រាក់', choices=[('USD', 'USD'), ('USD', 'KHR')])
+    date = DateField('កាលបរិច្ឆេទ', format='%Y-%m-%d', default=datetime.date.today, validators=[DataRequired()])
+    desc = StringField("កំណត់ចំណាំ")
+    submit = SubmitField("បញ្ចូល")
+
 class LoginForm(FlaskForm):
     username = StringField("ឈ្មោះអ្នកប្រើប្រាស់",validators=[DataRequired()])
     password = PasswordField("ពាក្យសម្ងាត់",validators=[DataRequired()])
@@ -63,6 +77,7 @@ def index():
                         data = res.json()
                         if data:
                             txn_details = data['data']
+                            print(txn_details)
                         return render_template('index.html', total_user=len(users), txn_details=txn_details)
         flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
         return redirect(url_for('login'))
@@ -100,6 +115,72 @@ def saving_deport():
             flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
             return redirect(url_for('login'))
         return render_template('saving_deport.html', form=form)
+    return redirect(url_for('login'))
+
+@app.route('/loan', methods=['GET','POST'])
+def loan():
+    if 'user_id' in session:
+        form = LoanForm()
+        if form.validate_on_submit():
+            amount = form.amount.data
+            currencyType = form.currencyType.data
+            date = form.date.data
+            desc = form.desc.data
+            req = {
+                "transaction_date": date.strftime('%Y-%m-%d'),
+                "amount": amount,
+                "transaction_desc": desc,
+                "user_id": session['user_id'],
+                "currency_type": currencyType,
+                "transaction_type": "loan",
+                "channel_id": channel_id
+            }
+            resp = RestConnector.internal_app_api('saving', 'deposit', req, "POST")
+            if resp:
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data and data['status'] == 0:
+                        flash("ប្រតិបត្តិការទទួលបានជោគជ័យ", 'success')
+                        return redirect(url_for('loan'))
+                    else:
+                        flash(data['message'], 'danger')
+                        return redirect(url_for('loan'))
+            flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
+            return redirect(url_for('login'))
+        return render_template('loan.html', form=form)
+    return redirect(url_for('login'))
+
+@app.route('/loan_repay', methods=['GET','POST'])
+def loan_repay():
+    if 'user_id' in session:
+        form = LoanRepayForm()
+        if form.validate_on_submit():
+            amount = form.amount.data
+            currencyType = form.currencyType.data
+            date = form.date.data
+            desc = form.desc.data
+            req = {
+                "transaction_date": date.strftime('%Y-%m-%d'),
+                "amount": amount,
+                "transaction_desc": desc,
+                "user_id": session['user_id'],
+                "currency_type": currencyType,
+                "transaction_type": "loan_repay",
+                "channel_id": channel_id
+            }
+            resp = RestConnector.internal_app_api('saving', 'deposit', req, "POST")
+            if resp:
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data and data['status'] == 0:
+                        flash("ប្រតិបត្តិការទទួលបានជោគជ័យ", 'success')
+                        return redirect(url_for('loan_repay'))
+                    else:
+                        flash(data['message'], 'danger')
+                        return redirect(url_for('loan_repay'))
+            flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
+            return redirect(url_for('login'))
+        return render_template('loan_repay.html', form=form)
     return redirect(url_for('login'))
 
 @app.route('/delete_transaction_by_id/<string:transaction_id>', methods=['DELETE'])
