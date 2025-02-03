@@ -12,11 +12,32 @@
         </ol>
       </nav>
     </div><!-- End Page Title -->
+    
     <section class="section">
       <div class="row">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">បញ្ចូលទឹកប្រាក់សន្សំ</h5>
+
+              <!-- Alert Messages -->
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+
+              <!-- Loading Indicator -->
+              <div id="loading" class="d-none">
+                  <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <p>Please wait...</p>
+              </div>
 
               <!-- Floating Labels Form -->
               <form class="row g-3" action="/saving_deport" method="POST">
@@ -70,4 +91,15 @@
     </section>
 
   </main><!-- End #main -->
+  
+  <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const form = document.querySelector("form");
+          const loadingIndicator = document.getElementById("loading");
+
+          form.addEventListener("submit", function() {
+              loadingIndicator.classList.remove("d-none"); // Show loading indicator
+          });
+      });
+  </script>
 {% endblock %}

@@ -92,11 +92,12 @@ def saving_deport():
                 if resp.status_code == 200:
                     data = resp.json()
                     if data and data['status'] == 0:
+                        flash("ប្រតិបត្តិការទទួលបានជោគជ័យ", 'success')
                         return redirect(url_for('saving_deport'))
                     else:
-                        flash(data['message'])
+                        flash(data['message'], 'danger')
                         return redirect(url_for('saving_deport'))
-            flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+            flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
             return redirect(url_for('login'))
         return render_template('saving_deport.html', form=form)
     return redirect(url_for('login'))
@@ -112,7 +113,7 @@ def delete_transaction_by_id(transaction_id):
         if resp:
             if resp.status_code == 200:
                 return resp.json()
-        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
         return redirect(url_for('login'))
     return redirect(url_for('login'))
 
@@ -132,7 +133,7 @@ def update_transaction_by_id(transaction_id):
         if resp:
             if resp.status_code == 200:
                 return resp.json()
-        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
         return redirect(url_for('login'))
     return redirect(url_for('login'))
 
@@ -149,7 +150,7 @@ def report():
                 if data:
                     txn_details = data['data']  # Fetch all users from the database
                     return render_template('report.html', txn_details=txn_details)
-        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
         return redirect(url_for('login'))
     return redirect(url_for('login'))
 
@@ -178,9 +179,9 @@ def register():
                 if data and data['status'] == 0:
                     return redirect(url_for('login'))
                 else:
-                    flash(data['message'])
+                    flash(data['message'], 'danger')
                     return redirect(url_for('register'))
-        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
         return redirect(url_for('login'))
 
     return render_template('register.html',form=form)
@@ -205,9 +206,9 @@ def login():
                     session['user_detail'] = data['data']
                     return redirect(url_for('index'))
                 else: 
-                    flash("ការចូលបានបរាជ័យ។ សូមពិនិត្យមើលឈ្មោះអ្នកប្រើប្រាស់ និងពាក្យសម្ងាត់របស់អ្នក។")
+                    flash("ការចូលបានបរាជ័យ។ សូមពិនិត្យមើលឈ្មោះអ្នកប្រើប្រាស់ និងពាក្យសម្ងាត់របស់អ្នក។", 'danger')
                     return redirect(url_for('login'))
-        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
         return redirect(url_for('login'))
 
     return render_template('login.html',form=form)

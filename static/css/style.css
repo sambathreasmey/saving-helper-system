@@ -222,10 +222,21 @@ h6 {
 
 /* Card */
 .card {
+  padding: inherit;
   margin-bottom: 30px;
   border: none;
   border-radius: 16px;
   box-shadow: 0px 0 30px rgba(1, 41, 112, 0.1);
+}
+
+.modal-content {
+  border-radius: 16px;
+  color: lightcyan;
+  background-color: #012970;
+}
+.modal-content .btn-close {
+  border-radius: 12px;
+  background-color: #ffffff75;
 }
 
 .card-header,
@@ -237,11 +248,49 @@ h6 {
 }
 
 .card-title {
-  padding: 20px 0 15px 0;
+  border-radius: 16px 16px 0 0;
+  margin: 0px -20px 16px -20px;
+  padding: 20px 20px 15px 20px;
+  background-color: #012970;
+  /* padding: 20px 0 15px 0; */
   font-size: 18px;
   font-weight: 500;
-  color: #012970;
+  color: #ffffff;
   font-family: "Poppins", sans-serif;
+}
+
+.datatable-search .datatable-input {
+  border-radius: 8px;
+  border-color: #012970;
+  border-width: 1px;
+}
+.datatable-selector {
+  border-radius: 8px;
+  border-color: #012970;
+}
+
+.btn-primary {
+  background-color: #012970;
+}
+
+.table tbody tr td {
+  vertical-align: middle; /* Center align the content vertically */
+}
+
+.table thead th {
+ background-color: #e3efff;
+}
+
+.table tbody tr:nth-child(odd) td {
+  background-color: #ffffff; /* Light gray for odd rows */
+}
+
+.table tbody tr:nth-child(even) td {
+  background-color: #8a97ac0e; /* White for even rows */
+}
+
+.table tbody tr:hover {
+  background-color: #f5f5f5; /* Darker gray on hover */
 }
 
 .card-title span {
@@ -1240,3 +1289,7 @@ h6 {
   color: #012970;
 }
 
+#loading {
+  text-align: center;
+  margin-top: 20px;
+}
