@@ -249,7 +249,7 @@ h6 {
 
 .card-title {
   border-radius: 16px 16px 0 0;
-  margin: 0px -20px 16px -20px;
+  margin: 0px -32px 16px -32px;
   padding: 20px 20px 15px 20px;
   background-color: #012970;
   /* padding: 20px 0 15px 0; */
@@ -887,6 +887,11 @@ h6 {
   background: #e0f8e9;
 }
 
+.dashboard .blance-card .card-icon {
+  color: #1dddff;
+  background: #d8f9ff;
+}
+
 .dashboard .customers-card .card-icon {
   color: #ff771d;
   background: #ffecdf;
@@ -1292,4 +1297,115 @@ h6 {
 #loading {
   text-align: center;
   margin-top: 20px;
+}
+
+.text-color-green {
+  color: green;
+}
+
+.limited-length {
+  max-width: 150px; /* Set a maximum width */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Show ellipsis for overflowed text */
+  white-space: nowrap; /* Prevent text from wrapping */
+  cursor: pointer; /* Change cursor to pointer to indicate it's clickable */
+  display: inline-block; /* Ensure the element respects max-width */
+}
+
+/* ANIMATION Templete */
+
+@keyframes pulse {
+  0% {
+      transform: scale(1);
+      background-color: #17a2b8; /* Original color */
+  }
+  50% {
+      transform: scale(1.1); /* Slightly enlarge */
+      background-color: #1abc9c; /* Change color */
+  }
+  100% {
+      transform: scale(1);
+      background-color: #17a2b8; /* Return to original color */
+  }
+}
+
+.animated-badge {
+  animation: pulse 1.5s infinite; /* Apply the pulse animation */
+}
+
+@keyframes pulse-text {
+  0% {
+      transform: scale(1);
+      color: #17a2b8; /* Original color */
+  }
+  50% {
+      transform: scale(1.1); /* Slightly enlarge */
+      color: #1abc9c; /* Change color */
+  }
+  100% {
+      transform: scale(1);
+      color: #17a2b8; /* Return to original color */
+  }
+}
+
+.animated-text {
+  animation: pulse-text 1.5s infinite; /* Apply the pulse animation */
+}
+
+@keyframes pulse-icon {
+  0% {
+      transform: scale(1);
+  }
+  50% {
+      transform: scale(1.2); /* Slightly enlarge */
+  }
+  100% {
+      transform: scale(1);
+  }
+}
+
+.animated-icon {
+  animation: pulse-icon 1.5s infinite; /* Apply the pulse animation */
+}
+
+@keyframes pulse-button {
+  0% {
+      transform: scale(1);
+  }
+  50% {
+      transform: scale(1.1); /* Slightly enlarge */
+  }
+  100% {
+      transform: scale(1);
+  }
+}
+
+.animated-button {
+  animation: pulse-button 1.5s infinite; /* Apply the pulse animation */
+}
+
+.animated-icon {
+  animation: pulse-icon 1.5s infinite; /* Apply the pulse animation */
+}
+
+@keyframes shark-item {
+  0% {
+      transform: translateX(0) scale(1);
+  }
+  25% {
+      transform: translateX(-1px) translateY(1px) scale(1.1); /* Move left and enlarge */
+  }
+  50% {
+      transform: translateX(1px) translateY(-1px) scale(1.1); /* Move right and enlarge */
+  }
+  75% {
+      transform: translateX(-1px) translateY(1px) scale(1.1); /* Move left and enlarge */
+  }
+  100% {
+      transform: translateX(0) scale(1); /* Return to original position */
+  }
+}
+
+.animated-shark-item {
+  animation: shark-item 1s infinite; /* Apply the shark animation */
 }
