@@ -88,7 +88,7 @@ def saving_deport():
     if 'user_id' in session:
         form = SavingDepositForm()
         if form.validate_on_submit():
-            if session['user_detail']['email_address'] not in 'engsoknai471@gmail.com':
+            if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
                 flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
                 return redirect(url_for('saving_deport'))
             amount = form.amount.data
@@ -125,7 +125,7 @@ def loan():
     if 'user_id' in session:
         form = LoanForm()
         if form.validate_on_submit():
-            if session['user_detail']['email_address'] not in 'engsoknai471@gmail.com':
+            if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
                 flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
                 return redirect(url_for('saving_deport'))
             amount = form.amount.data
@@ -161,7 +161,7 @@ def loan_repay():
     if 'user_id' in session:
         form = LoanRepayForm()
         if form.validate_on_submit():
-            if session['user_detail']['email_address'] not in 'engsoknai471@gmail.com':
+            if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
                 flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
                 return redirect(url_for('saving_deport'))
             amount = form.amount.data
@@ -195,7 +195,7 @@ def loan_repay():
 @app.route('/delete_transaction_by_id/<string:transaction_id>', methods=['DELETE'])
 def delete_transaction_by_id(transaction_id):
     if 'user_id' in session:
-        if session['user_detail']['email_address'] not in 'engsoknai471@gmail.com':
+        if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
             flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
             return redirect(url_for('saving_deport'))
         req = {
@@ -213,7 +213,7 @@ def delete_transaction_by_id(transaction_id):
 @app.route('/update_transaction_by_id/<string:transaction_id>', methods=['PUT'])
 def update_transaction_by_id(transaction_id):
     if 'user_id' in session:
-        if session['user_detail']['email_address'] not in 'engsoknai471@gmail.com':
+        if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
             flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
             return redirect(url_for('saving_deport'))
         req = {

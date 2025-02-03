@@ -26,10 +26,10 @@
                             <table class="table datatable">
                                 <thead>
                                     <tr>
-                                        <th data-type="date" data-format="YYYY/DD/MM">កាលបរិច្ឆេទ</th>
+                                        <th>កាលបរិច្ឆេទ</th>
                                         <th>ចំនូនទឹកប្រាក់</th>
                                         <th>ប្រភេទសាច់ប្រាក់</th>
-                                        <th data-type="date" data-format="YYYY/DD/MM">កាលបរិច្ឆេទបញ្ជូល</th>
+                                        <th>កាលបរិច្ឆេទបញ្ជូល</th>
                                         <th>កំណត់សម្គាល់</th>
                                         <th>ប្រភេទប្រតិបត្តិការ</th>
                                         <th>
@@ -46,11 +46,24 @@
                                         <td><span class="badge bg-info animated-badge">{{ txn_detail.currency_type }}</span></td>
                                         <td>{{ txn_detail.created_on }}</td>
                                         <td>
-                                            <span class="limited-length animated-text" data-full-text="{{ txn_detail.transaction_desc }}">
+                                            <span class="limited-length" data-full-text="{{ txn_detail.transaction_desc }}">
                                                 {{ txn_detail.transaction_desc }}
                                             </span>
                                         </td>
-                                        <td>{{ txn_detail.transaction_type }}</td>
+                                        <td class="text-center"><span class="badge bg-warning animated-shark-item">
+                                            {% if txn_detail.transaction_type == 'loan' %}
+                                                កម្ចី
+                                            {% elif txn_detail.transaction_type == 'loan_repay' %}
+                                                សងប្រាក់កម្ចី
+                                            {% elif txn_detail.transaction_type == 'saving_deposit' %}
+                                                សន្សំ
+                                            {% elif txn_detail.transaction_type == 'saving_deposit_more' %}
+                                                សន្សំបន្ថែម
+                                            {% else %}
+                                                {{ txn_detail.transaction_type }}
+                                            {% endif %}
+                                            </span>
+                                        </td>
                                         <td>{{ txn_detail.transaction_id }}</td>
                                         <td>
                                             <a href="#" class="btn btn-primary btn-edit"
@@ -154,6 +167,14 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const searchElement = document.querySelector('.datatable-search .datatable-input');
+        searchElement.setAttribute('placeholder', 'ស្វែងរក...'); // Change to "ស្វែងរក..."
+        const infoElement = document.querySelector('.datatable-bottom .datatable-info');
+        const numbersArray = infoElement.innerHTML.split(' ').filter(item => !isNaN(item));
+        if (infoElement.innerHTML) {
+          infoElement.textContent = "បង្ហាញ "+numbersArray[0]+" ទៅ "+numbersArray[1]+" នៃ "+numbersArray[2]+" ធាតុ";
+        }
+
         const label = document.querySelector('label');
         if (label) {
             label.childNodes.forEach(node => {

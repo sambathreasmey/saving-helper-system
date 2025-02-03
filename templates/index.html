@@ -372,28 +372,33 @@
 
           <table class="table table-borderless datatable">
             <thead>
-              <tr>
-                <th scope="col">កាលបរិច្ឆេទ</th>
-                <th scope="col">ចំនូនទឹកប្រាក់</th>
-                <th scope="col">ស្ថានភាព</th>
-                <th scope="col">បរិយាយ</th>
-              </tr>
+                <tr>
+                    <th scope="col">កាលបរិច្ឆេទ</th>
+                    <th scope="col">ចំនូនទឹកប្រាក់</th>
+                    <th scope="col">ស្ថានភាព</th>
+                    <th scope="col">បរិយាយ</th>
+                </tr>
             </thead>
             <tbody>
-              {% for txn_detail in txn_details %}
-              <tr>
-                <td>{{ txn_detail.transaction_date }}</td>
-                <td><b>{{ txn_detail.amount }}</b> <span class="badge bg-info">{{ txn_detail.currency_type }}</span></td>
-                <td><span class="badge bg-success">Approved</span></td>
-                <td><a href="" class="text-primary">{{ txn_detail.transaction_desc }}</a></td>
-              </tr>
-              {% else %}
-                <tr>
-                    <td colspan="6" class="text-center no-users">No transaction found</td>
-                </tr>
-              {% endfor %}
+                {% set has_transactions = false %}
+                {% for txn_detail in txn_details %}
+                    {% if txn_detail.transaction_type in ['saving_deposit', 'saving_deposit_more'] %}
+                        <tr>
+                            <td>{{ txn_detail.transaction_date }}</td>
+                            <td><b>{{ txn_detail.amount }}</b> <span class="badge bg-info">{{ txn_detail.currency_type }}</span></td>
+                            <td><span class="badge bg-success">Approved</span></td>
+                            <td><a href="" class="text-primary">{{ txn_detail.transaction_desc }}</a></td>
+                        </tr>
+                        {% set has_transactions = true %}
+                    {% endif %}
+                {% endfor %}
+                {% if has_transactions %}
+                    <tr>
+                        <td colspan="4" class="text-center no-users">No transaction found</td>
+                    </tr>
+                {% endif %}
             </tbody>
-          </table>
+        </table>
 
         </div>
 
@@ -420,54 +425,35 @@
         <div class="card-body pb-0">
           <h5 class="card-title">តារាងសន្សំខ្ពស់បំផុត <span>| ទាំងអស់</span></h5>
 
-          <table class="table table-borderless">
+          <table class="table table-borderless" id="top-deposit-table">
             <thead>
-              <tr>
-                <th scope="col">Preview</th>
-                <th scope="col">Product</th>
-                <th scope="col">Price</th>
-                <th scope="col">Sold</th>
-                <th scope="col">Revenue</th>
-              </tr>
+                <tr>
+                    <th scope="col">កាលបរិច្ឆេទ</th>
+                    <th scope="col">ចំនូនទឹកប្រាក់</th>
+                    <th scope="col">ស្ថានភាព</th>
+                    <th scope="col">បរិយាយ</th>
+                </tr>
             </thead>
             <tbody>
-              <tr>
-                <th scope="row"><a href="#"><img src="../static/img/product-1.jpg" alt=""></a></th>
-                <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
-                <td>$64</td>
-                <td class="fw-bold">124</td>
-                <td>$5,828</td>
-              </tr>
-              <tr>
-                <th scope="row"><a href="#"><img src="../static/img/product-2.jpg" alt=""></a></th>
-                <td><a href="#" class="text-primary fw-bold">Exercitationem similique doloremque</a></td>
-                <td>$46</td>
-                <td class="fw-bold">98</td>
-                <td>$4,508</td>
-              </tr>
-              <tr>
-                <th scope="row"><a href="#"><img src="../static/img/product-3.jpg" alt=""></a></th>
-                <td><a href="#" class="text-primary fw-bold">Doloribus nisi exercitationem</a></td>
-                <td>$59</td>
-                <td class="fw-bold">74</td>
-                <td>$4,366</td>
-              </tr>
-              <tr>
-                <th scope="row"><a href="#"><img src="../static/img/product-4.jpg" alt=""></a></th>
-                <td><a href="#" class="text-primary fw-bold">Officiis quaerat sint rerum error</a></td>
-                <td>$32</td>
-                <td class="fw-bold">63</td>
-                <td>$2,016</td>
-              </tr>
-              <tr>
-                <th scope="row"><a href="#"><img src="../static/img/product-5.jpg" alt=""></a></th>
-                <td><a href="#" class="text-primary fw-bold">Sit unde debitis delectus repellendus</a></td>
-                <td>$79</td>
-                <td class="fw-bold">41</td>
-                <td>$3,239</td>
-              </tr>
+              {% set has_transactions = false %}
+                {% for txn_detail in txn_details %}
+                    {% if txn_detail.transaction_type in ['saving_deposit', 'saving_deposit_more'] %}
+                        <tr>
+                            <td>{{ txn_detail.transaction_date }}</td>
+                            <td><b>{{ txn_detail.amount }}</b> <span class="badge bg-info">{{ txn_detail.currency_type }}</span></td>
+                            <td><span class="badge bg-success">Approved</span></td>
+                            <td><a href="" class="text-primary">{{ txn_detail.transaction_desc }}</a></td>
+                        </tr>
+                        {% set has_transactions = true %}
+                    {% endif %}
+                {% endfor %}
+                {% if has_transactions %}
+                    <tr>
+                        <td colspan="4" class="text-center no-users">No transaction found</td>
+                    </tr>
+                {% endif %}
             </tbody>
-          </table>
+        </table>
 
         </div>
 
@@ -476,4 +462,44 @@
   </section>
 
   </main><!-- End #main -->
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchElement = document.querySelector('.datatable-search .datatable-input');
+        searchElement.setAttribute('placeholder', 'ស្វែងរក...'); // Change to "ស្វែងរក..."
+        const infoElement = document.querySelector('.datatable-bottom .datatable-info');
+        const numbersArray = infoElement.innerHTML.split(' ').filter(item => !isNaN(item));
+        if (infoElement.innerHTML) {
+          infoElement.textContent = "បង្ហាញ "+numbersArray[0]+" ទៅ "+numbersArray[1]+" នៃ "+numbersArray[2]+" ធាតុ";
+        }
+
+        const label = document.querySelector('label');
+        if (label) {
+            label.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node.remove();
+                }
+            });
+        }
+
+        const limitedCells = document.querySelectorAll('.limited-length');
+        limitedCells.forEach(cell => {
+            cell.addEventListener('click', function() {
+                // Check if the cell is currently expanded
+                if (cell.classList.contains('expanded')) {
+                    // Collapse the cell
+                    cell.classList.remove('expanded');
+                    cell.textContent = cell.dataset.fullText; // Show full text
+                    cell.style.whiteSpace = 'nowrap'; // Prevent wrapping
+                } else {
+                    // Expand the cell
+                    cell.classList.add('expanded');
+                    cell.textContent = cell.dataset.fullText; // Show full text
+                    cell.style.whiteSpace = 'normal'; // Allow wrapping
+                }
+            });
+        });
+    });
+  </script>
+
   {% endblock %}
