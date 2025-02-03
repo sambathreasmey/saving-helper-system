@@ -58,7 +58,7 @@
 
                 <div class="card-body">
 
-                  <div class="pt-4 pb-2">
+                  <div class="pb-2">
                     {% with messages = get_flashed_messages() %}
                     {% if messages %}
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -69,14 +69,14 @@
                         </div>
                     {% endif %}
                     {% endwith %}
-                    <h5 class="card-title text-center pb-0 fs-4">ចូលទៅគណនីរបស់អ្នក</h5>
+                    <h5 class="card-title text-center pb-4 fs-4">ចូលទៅគណនីរបស់អ្នក</h5>
                     <p class="text-center small">បញ្ចូលឈ្មោះអ្នកប្រើ និងពាក្យសម្ងាត់របស់អ្នកដើម្បីចូល</p>
                   </div>
 
                   <form class="row g-3 needs-validation" novalidate action="/login" method="POST">
                     {{ form.hidden_tag() }}
                     <div class="col-12">
-                        {{ form.username.label(for="username")}}
+                        {{ form.username.label(for="username", class="form-label")}}
                       <!-- <label for="yourUsername" class="form-label">Username</label> -->
                       <div class="input-group has-validation">
                         <span class="input-group-text" id="inputGroupPrepend">@</span>
@@ -87,7 +87,7 @@
                     </div>
 
                     <div class="col-12">
-                        {{ form.password.label(for="password")}}
+                        {{ form.password.label(for="password", class="form-label")}}
                       <!-- <label for="yourPassword" class="form-label">Password</label> -->
                       {{ form.password(id="password", class="form-control")}}
                       <!-- <input type="password" name="password" class="form-control" id="yourPassword" required> -->
