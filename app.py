@@ -77,7 +77,6 @@ def index():
                         data = res.json()
                         if data:
                             txn_details = data['data']
-                            print(txn_details)
                         return render_template('index.html', total_user=len(users), txn_details=txn_details)
         flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
         return redirect(url_for('login'))
@@ -312,10 +311,21 @@ def login():
 @app.route('/onload')
 def onload():
     req = {
-            "user_detail": session['user_detail'],
-            "user_name": session['user_id']
-        }
-    return req
+        "channel_id": channel_id
+    }
+    notification = None
+    resNotification = RestConnector.internal_app_api('saving', 'notification', req, "POST")
+    if resNotification:
+        if resNotification.status_code == 200:
+            data = resNotification.json()
+            if data:
+                notification = data
+    res = {
+        "user_detail": session['user_detail'],
+        "user_name": session['user_id'],
+        "notification": notification
+    }
+    return res
 
 @app.route('/logout')
 def logout():

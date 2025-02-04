@@ -70,12 +70,12 @@
 
           <a class="nav-link nav-icon animated-shark-item" href="#" data-bs-toggle="dropdown">
             <i class="bi bi-bell"></i>
-            <span class="badge bg-primary badge-number">4</span>
+            <span class="badge bg-primary badge-number">1</span>
           </a><!-- End Notification Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">
-              You have 4 new notifications
+              You have 1 new notifications
               <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
             </li>
             <li>
@@ -83,53 +83,15 @@
             </li>
 
             <li class="notification-item">
-              <i class="bi bi-exclamation-circle text-warning"></i>
+              <i id="noti_icon" class="bi bi-exclamation-circle text-warning"></i>
               <div>
-                <h4>Lorem Ipsum</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
+                <h4 id="noti_title">Lorem Ipsum</h4>
+                <p id="noti_desc">Quae dolorem earum veritatis oditseno</p>
                 <p>30 min. ago</p>
               </div>
             </li>
 
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-x-circle text-danger"></i>
-              <div>
-                <h4>Atque rerum nesciunt</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>1 hr. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-check-circle text-success"></i>
-              <div>
-                <h4>Sit rerum fuga</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>2 hrs. ago</p>
-              </div>
-            </li>
-
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-
-            <li class="notification-item">
-              <i class="bi bi-info-circle text-primary"></i>
-              <div>
-                <h4>Dicta reprehenderit</h4>
-                <p>Quae dolorem earum veritatis oditseno</p>
-                <p>4 hrs. ago</p>
-              </div>
-            </li>
-
+            
             <li>
               <hr class="dropdown-divider">
             </li>
@@ -396,6 +358,29 @@
         profile_full_name.innerHTML = data.user_detail.full_name;
         profile_user_name.innerHTML = data.user_detail.user_name;
         profile_user_email.innerHTML = data.user_detail.email_address;
+
+        const noti_title = document.getElementById('noti_title');
+        const noti_desc = document.getElementById('noti_desc');
+        const noti_icon = document.getElementById('noti_icon');
+        noti_desc.innerHTML = data.notification.message;
+        noti_title.innerHTML = 'រំលឹក';
+        switch(data.notification.code) {
+          case 200:
+            noti_icon.classList.remove('bi-exclamation-circle');
+            noti_icon.classList.remove('text-warning');
+            noti_icon.classList.add('bi-check-circle');
+            noti_icon.classList.add('text-success');
+            break;
+          case 201:
+            break;
+          default:
+            noti_icon.classList.remove('bi-exclamation-circle');
+            noti_icon.classList.remove('text-warning');
+            noti_icon.classList.add('bi-x-circle');
+            noti_icon.classList.add('text-danger');
+            break;
+        }
+        
       })
       .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
