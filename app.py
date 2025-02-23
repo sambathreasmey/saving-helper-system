@@ -5,6 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField, DateField, SelectField, StringField,PasswordField,SubmitField
 from wtforms.validators import DataRequired, Email
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 from internal_connector import RestConnector
 
@@ -15,6 +16,7 @@ channel_id = "sambathreasmey"
 
 app = Flask(__name__)
 app.secret_key = secret_key
+CORS(app)
 
 class RegisterForm(FlaskForm):
     full_name = StringField("ឈ្មោះពេញ",validators=[DataRequired()])
