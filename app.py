@@ -1,6 +1,6 @@
 import datetime
 import os
-from flask import Flask, render_template, redirect, request, url_for, session, flash
+from flask import Flask, jsonify, render_template, redirect, request, url_for, session, flash
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, DateField, SelectField, StringField,PasswordField,SubmitField
 from wtforms.validators import DataRequired, Email
@@ -331,6 +331,24 @@ def onload():
 def logout():
     session.pop('user_id', None)
     return redirect(url_for('login'))
+
+
+# external api
+@app.route('/api/user_login', methods=['POST'])
+def user_login():
+    req = {
+        "channel_id": channel_id,
+        "user_name": request.get_json().get('user_name'),
+        "password": request.get_json().get('password')
+    }
+    res = RestConnector.internal_app_api('partner', 'user_login', req, "POST")
+    if res:
+        if res.status_code == 200:
+            data = res.json()
+            if data and data['status'] == 0:
+                return jsonify(data)
+            else:
+                return jsonify(data)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
