@@ -19,11 +19,26 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">ប្រតិបត្តិការទូទៅ</h5>
-                        <!-- <p>នេះគឺជាប្រតិបត្តិការណ៍ទូទៅ យើងអាចស្វែងរកទិន្នន័យលំអិល និងធ្វើការកែប្រែទិន្នន័យបានយ៉ាងងាយស្រួល ក្នុងករណីរបាយការណ៍ទិន្នន័យរបស់អ្នកបញ្ចូលខុសប្រក្រតី</p> -->
+    
+                       <!-- Filter Section -->
+                       {% if is_general %}
+                        <form class="row g-3">
+                            <div class="form-floating mb-3 col-lg-3">
+                                <select id="transaction_type_filter" class="form-select">
+                                    <option value="">ទាំងអស់</option>
+                                    <option value="loan">កម្ចី</option>
+                                    <option value="loan_repay">សងប្រាក់កម្ចី</option>
+                                    <option value="saving_deposit">សន្សំ</option>
+                                    <option value="saving_deposit_more">សន្សំបន្ថែម</option>
+                                </select>
+                                <label for="transaction_type_filter" class="form-label">Filter by Transaction Type</label>
+                            </div>
+                        </form>
+                        {% endif %}
 
                         <!-- Table with stripped rows -->
                         <div class="table-responsive">
-                            <table class="table datatable">
+                            <table class="table datatable" id="transaction_table">
                                 <thead>
                                     <tr>
                                         <th>កាលបរិច្ឆេទ</th>
@@ -32,15 +47,13 @@
                                         <th>កាលបរិច្ឆេទបញ្ជូល</th>
                                         <th>កំណត់សម្គាល់</th>
                                         <th>ប្រភេទប្រតិបត្តិការ</th>
-                                        <th>
-                                            <b>លេខសំគាល់</b>
-                                        </th>
+                                        <th><b>លេខសំគាល់</b></th>
                                         <th>កំណត់</th> <!-- New column for actions -->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for txn_detail in txn_details %}
-                                    <tr>
+                                    <tr class="transaction-row" data-transaction-type="{{ txn_detail.transaction_type }}">
                                         <td>{{ txn_detail.transaction_date }}</td>
                                         <td class="text-center"><b>{{ txn_detail.amount }}</b></td>
                                         <td><span class="badge bg-info animated-badge">{{ txn_detail.currency_type }}</span></td>
@@ -50,33 +63,30 @@
                                                 {{ txn_detail.transaction_desc }}
                                             </span>
                                         </td>
-                                        <td class="text-center"><span class="badge bg-warning animated-shark-item">
-                                            {% if txn_detail.transaction_type == 'loan' %}
-                                                កម្ចី
-                                            {% elif txn_detail.transaction_type == 'loan_repay' %}
-                                                សងប្រាក់កម្ចី
-                                            {% elif txn_detail.transaction_type == 'saving_deposit' %}
-                                                សន្សំ
-                                            {% elif txn_detail.transaction_type == 'saving_deposit_more' %}
-                                                សន្សំបន្ថែម
-                                            {% else %}
-                                                {{ txn_detail.transaction_type }}
-                                            {% endif %}
+                                        <td class="text-center">
+                                            <span class="badge bg-warning animated-shark-item">
+                                                {% if txn_detail.transaction_type == 'loan' %}
+                                                    កម្ចី
+                                                {% elif txn_detail.transaction_type == 'loan_repay' %}
+                                                    សងប្រាក់កម្ចី
+                                                {% elif txn_detail.transaction_type == 'saving_deposit' %}
+                                                    សន្សំ
+                                                {% elif txn_detail.transaction_type == 'saving_deposit_more' %}
+                                                    សន្សំបន្ថែម
+                                                {% else %}
+                                                    {{ txn_detail.transaction_type }}
+                                                {% endif %}
                                             </span>
                                         </td>
                                         <td>{{ txn_detail.transaction_id }}</td>
                                         <td>
-                                            <a href="#" class="btn btn-primary btn-edit"
-                                                data-id="{{ txn_detail.transaction_id }}"
-                                                data-amount="{{ txn_detail.amount }}"
-                                                data-transaction_date="{{ txn_detail.transaction_date }}"
-                                                data-currency_type="{{ txn_detail.currency_type }}"
-                                                data-transaction_desc="{{ txn_detail.transaction_desc }}"
-                                                data-transaction_type="{{ txn_detail.transaction_type }}"><i
-                                                    class="bi bi-pencil-square"></i></a>
-                                            <a href="#" class="btn btn-danger"
-                                                onclick="deleteTransaction('{{ txn_detail.transaction_id }}'); return false;"><i
-                                                    class="bi bi-trash"></i></a>
+                                            <a href="#" class="btn btn-primary btn-edit" data-id="{{ txn_detail.transaction_id }}"
+                                                data-amount="{{ txn_detail.amount }}" data-transaction_date="{{ txn_detail.transaction_date }}"
+                                                data-currency_type="{{ txn_detail.currency_type }}" data-transaction_desc="{{ txn_detail.transaction_desc }}"
+                                                data-transaction_type="{{ txn_detail.transaction_type }}"><i class="bi bi-pencil-square"></i></a>
+                                            <a href="#" class="btn btn-danger" onclick="deleteTransaction('{{ txn_detail.transaction_id }}'); return false;">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                     {% else %}
@@ -88,11 +98,12 @@
                             </table>
                         </div>
                         <!-- End Table with stripped rows -->
+
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </section>    
 
     <div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel"
         aria-hidden="true">
@@ -165,7 +176,7 @@
 </main><!-- End #main -->
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script>
+<script>  
     document.addEventListener('DOMContentLoaded', function () {
         const searchElement = document.querySelector('.datatable-search .datatable-input');
         searchElement.setAttribute('placeholder', 'ស្វែងរក...'); // Change to "ស្វែងរក..."
@@ -198,6 +209,22 @@
                     cell.classList.add('expanded');
                     cell.textContent = cell.dataset.fullText; // Show full text
                     cell.style.whiteSpace = 'normal'; // Allow wrapping
+                }
+            });
+        });
+
+         // Transaction type filter
+        const filterElement = document.getElementById('transaction_type_filter');
+        filterElement.addEventListener('change', function () {
+            const selectedType = filterElement.value;
+            const rows = document.querySelectorAll('.transaction-row');
+
+            rows.forEach(row => {
+                const rowType = row.getAttribute('data-transaction-type');
+                if (selectedType === "" || rowType === selectedType) {
+                    row.style.display = ''; // Show row
+                } else {
+                    row.style.display = 'none'; // Hide row
                 }
             });
         });

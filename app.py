@@ -244,8 +244,15 @@ def update_transaction_by_id(transaction_id):
 @app.route('/report')
 def report():
     if 'user_id' in session:
+        #check report type
+        report_type = request.args.get('transaction_type', '')  # Default to '' if not provided
+        is_general = True
+        if report_type:
+            is_general = False
+
         req = {
-                "channel_id": channel_id
+                "channel_id": channel_id,
+                "report_type": report_type
             }
         res = RestConnector.internal_app_api('saving', 'transaction_detail', req, "POST")
         if res:
@@ -253,7 +260,7 @@ def report():
                 data = res.json()
                 if data:
                     txn_details = data['data']  # Fetch all users from the database
-                    return render_template('report.html', txn_details=txn_details)
+                    return render_template('report.html', txn_details=txn_details, is_general=is_general)
         flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
         return redirect(url_for('login'))
     return redirect(url_for('login'))

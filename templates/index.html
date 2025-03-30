@@ -21,49 +21,51 @@
 
              <!-- Revenue Card -->
              <div class="col-xxl-4 col-md-6">
-              <div class="card info-card revenue-card">
+                <div class="card info-card revenue-card">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
+                  <div class="filter">
+                    <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                      <li class="dropdown-header text-start">
+                        <h6>Filter</h6>
+                      </li>
 
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">សន្សំ <span>| ទាំងអស់</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-piggy-bank animated-icon"></i>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                      <div class="ps-3">
-                        <h6>${{ dashboard.total_saving_deposit }}</h6>
-                        <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">កើនឡើង</span>
-                      </div>
-                      <div class="ps-3 " style="font-size: 12px;">
-                        <div class="ps-3 ">
-                          <span class="text-success small pt-1 fw-bold">+${{ dashboard.saving_today }}</span> <span class="text-muted small pt-2 ps-1">ថ្ងៃនេះ</span>
-                        </div>
-                        <div class="ps-3 ">
-                          <span class="text-success small pt-1 fw-bold">+${{ dashboard.saving_yesterday }}</span> <span class="text-muted small pt-2 ps-1">ម្សិលមិញ</span>
-                        </div>
-                        <div class="ps-3 ">
-                          <span class="text-success small pt-1 fw-bold">+${{ dashboard.saving_this_month }}</span> <span class="text-muted small pt-2 ps-1">១ខែចុងក្រោយ</span>
-                        </div>
-                      </div>
-                    </div>
+                      <li><a class="dropdown-item" href="#">Today</a></li>
+                      <li><a class="dropdown-item" href="#">This Month</a></li>
+                      <li><a class="dropdown-item" href="#">This Year</a></li>
+                    </ul>
                   </div>
-                </div>
 
-              </div>
+                  <a href="/report?transaction_type=saving_deposit,saving_deposit_more">
+                    <div class="card-body">
+                      <h5 class="card-title">សន្សំ <span>| ទាំងអស់</span></h5>
+
+                      <div class="d-flex align-items-center">
+                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                          <i class="bi bi-piggy-bank animated-icon"></i>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                          <div class="ps-3">
+                            <h6>${{ dashboard.total_saving_deposit }}</h6>
+                            <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">កើនឡើង</span>
+                          </div>
+                          <div class="ps-3 " style="font-size: 12px;">
+                            <div class="ps-3 ">
+                              <span class="text-success small pt-1 fw-bold">+${{ dashboard.saving_today }}</span> <span class="text-muted small pt-2 ps-1">ថ្ងៃនេះ</span>
+                            </div>
+                            <div class="ps-3 ">
+                              <span class="text-success small pt-1 fw-bold">+${{ dashboard.saving_yesterday }}</span> <span class="text-muted small pt-2 ps-1">ម្សិលមិញ</span>
+                            </div>
+                            <div class="ps-3 ">
+                              <span class="text-success small pt-1 fw-bold">+${{ dashboard.saving_this_month }}</span> <span class="text-muted small pt-2 ps-1">១ខែចុងក្រោយ</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+
+                </div>
             </div><!-- End Revenue Card -->
 
             <!-- Sales Card -->
@@ -83,20 +85,22 @@
                   </ul>
                 </div>
 
-                <div class="card-body">
-                  <h5 class="card-title">កម្ចី <span>| ទាំងអស់</span></h5>
+                <a href="/report?transaction_type=loan,loan_repay">
+                  <div class="card-body">
+                    <h5 class="card-title">កម្ចី <span>| ទាំងអស់</span></h5>
 
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-currency-dollar animated-icon"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6>${{ dashboard.loan_balance }}</h6>
-                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">កើនឡើង</span>
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-currency-dollar animated-icon"></i>
+                      </div>
+                      <div class="ps-3">
+                        <h6>${{ dashboard.loan_balance }}</h6>
+                        <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">កើនឡើង</span>
 
+                      </div>
                     </div>
                   </div>
-                </div>
+                </a>
 
               </div>
             </div><!-- End Sales Card -->
