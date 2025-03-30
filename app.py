@@ -74,12 +74,19 @@ def index():
                     req = {
                         "channel_id": channel_id
                     }
+                    #get transactions detail
                     res = RestConnector.internal_app_api('saving', 'transaction_detail', req, "POST")
                     if res.status_code == 200:
                         data = res.json()
                         if data:
                             txn_details = data['data']
-                        return render_template('index.html', total_user=len(users), txn_details=txn_details)
+                    #get dashboard
+                    res_dashboard = RestConnector.internal_app_api('saving', 'dashboard', req, "POST")
+                    if res_dashboard.status_code == 200:
+                        data = res_dashboard.json()
+                        if data:
+                            dashboard = data['dashboard']
+                    return render_template('index.html', total_user=len(users), txn_details=txn_details, dashboard=dashboard)
         flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
         return redirect(url_for('login'))
     return redirect(url_for('login'))
