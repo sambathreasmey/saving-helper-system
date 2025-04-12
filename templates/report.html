@@ -55,7 +55,17 @@
                                     {% for txn_detail in txn_details %}
                                     <tr class="transaction-row" data-transaction-type="{{ txn_detail.transaction_type }}">
                                         <td>{{ txn_detail.transaction_date }}</td>
-                                        <td class="text-center"><b>{{ txn_detail.amount }}</b></td>
+                                        <td class="text-center"><b>{{ txn_detail.amount }}</b>
+                                            {% if txn_detail.transaction_type == 'loan' %}
+                                            &nbsp;&nbsp;
+                                                <a href="#" data-id="{{ txn_detail.transaction_id }}"
+                                                data-amount="{{ txn_detail.amount }}" data-transaction_date="{{ txn_detail.transaction_date }}"
+                                                data-currency_type="{{ txn_detail.currency_type }}" data-transaction_desc="{{ txn_detail.transaction_desc }}"
+                                                data-transaction_type="{{ txn_detail.transaction_type }}" onclick="console.error(''error');">
+                                                <span class="badge bg-danger animated-shark-item"> មិនទាន់សង -{{ txn_detail.remain_balance }}$</span>
+                                                </a>
+                                            {% endif %}
+                                        </td>
                                         <td><span class="badge bg-info animated-badge">{{ txn_detail.currency_type }}</span></td>
                                         <td>{{ txn_detail.created_on }}</td>
                                         <td>
@@ -64,7 +74,7 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-warning animated-shark-item">
+                                            <span class="badge bg-primary animated-shark-item">
                                                 {% if txn_detail.transaction_type == 'loan' %}
                                                     កម្ចី
                                                 {% elif txn_detail.transaction_type == 'loan_repay' %}
@@ -87,6 +97,9 @@
                                             <a href="#" class="btn btn-danger" onclick="deleteTransaction('{{ txn_detail.transaction_id }}'); return false;">
                                                 <i class="bi bi-trash"></i>
                                             </a>
+                                            <a href="#" class="btn btn-success" onclick="deleteTransaction('{{ txn_detail.transaction_id }}'); return false;">
+                                                <i class="bi bi-repeat"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                     {% else %}
@@ -98,6 +111,11 @@
                             </table>
                         </div>
                         <!-- End Table with stripped rows -->
+
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transactionListModal">
+                            View Loan Repayment Transactions
+                          </button>
+                          
 
                     </div>
                 </div>
@@ -172,6 +190,45 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="transactionListModal" tabindex="-1" aria-labelledby="transactionListModalLabel"
+        aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionListModalLabel">បញ្ជីប្រតិបត្ដិការ សងប្រាក់កម្ចី</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Alert Messages -->
+                <div id="alertMessage" class="alert d-none" role="alert"></div>
+
+                <!-- Transaction List Table -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">លេខប្រតិបត្ដិការប្រាក់កម្ចី</th>
+                            <th scope="col">កាលបរិច្ឆេទ</th>
+                            <th scope="col">ចំនួនទឹកប្រាក់សង</th>
+                            <th scope="col">ប្រភេទសាច់ប្រាក់</th>
+                            <th scope="col">កំណត់សម្គាល់</th>
+                            <th scope="col">កំណត់បញ្ជា</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionList">
+                        <!-- Dynamic List of Loan Repayments will go here -->
+                    </tbody>
+                </table>
+
+                <!-- No data available message -->
+                <div id="noDataMessage" class="d-none text-center">
+                    <p>មិនមានទិន្នន័យប្រតិបត្ដិការទេ</p> <!-- "No transaction data available" -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 </main><!-- End #main -->
 
@@ -327,6 +384,96 @@
         });
     });
 
+</script>
+
+
+<script>
+    // Example data - in practice, this could come from an API or database
+    const transactions = [
+        {
+            transaction_id: 'TRX123',
+            transaction_date: '2025-04-06',
+            amount: 500,
+            currency_type: 'USD',
+            transaction_desc: 'Loan repayment for April'
+        },
+        {
+            transaction_id: 'TRX124',
+            transaction_date: '2025-03-20',
+            amount: 300,
+            currency_type: 'KHR',
+            transaction_desc: 'Loan repayment for March'
+        },
+        {
+            transaction_id: 'TRX124',
+            transaction_date: '2025-03-20',
+            amount: 300,
+            currency_type: 'KHR',
+            transaction_desc: 'Loan repayment for March'
+        },
+        {
+            transaction_id: 'TRX124',
+            transaction_date: '2025-03-20',
+            amount: 300,
+            currency_type: 'KHR',
+            transaction_desc: 'Loan repayment for March'
+        }
+    ];
+
+    // Function to load the transaction data into the table
+    function loadTransactionList() {
+        console.log("loadTransactionList");
+        const transactionList = document.getElementById('transactionList');
+        const noDataMessage = document.getElementById('noDataMessage');
+
+        // If no transactions exist
+        if (transactions.length === 0) {
+            noDataMessage.classList.remove('d-none');
+            return;
+        }
+
+        // Hide no data message
+        noDataMessage.classList.add('d-none');
+
+        // Clear the current table content
+        transactionList.innerHTML = '';
+
+        // Populate the table with transactions
+        transactions.forEach(transaction => {
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td>${transaction.transaction_id}</td>
+                <td>${transaction.transaction_date}</td>
+                <td>${transaction.amount}</td>
+                <td>${transaction.currency_type}</td>
+                <td>${transaction.transaction_desc}</td>
+                <td>
+                    <button class="btn btn-info btn-sm" onclick="editTransaction('${transaction.transaction_id}')">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTransaction('${transaction.transaction_id}')">Delete</button>
+                </td>
+            `;
+            transactionList.appendChild(row);
+        });
+    }
+
+    // Edit transaction function (example)
+    function editTransaction(transactionId) {
+        alert('Edit transaction: ' + transactionId);
+        // Add functionality to edit the transaction here
+    }
+
+    // Delete transaction function (example)
+    function deleteTransaction(transactionId) {
+        if (confirm('Are you sure you want to delete this transaction?')) {
+            // Add functionality to delete the transaction here
+            alert('Transaction ' + transactionId + ' deleted');
+        }
+    }
+
+    // Load the transaction list when the modal is shown
+    const transactionListModal = document.getElementById('transactionListModal');
+    transactionListModal.addEventListener('show.bs.modal', loadTransactionList);
 </script>
 
 {% endblock %}
