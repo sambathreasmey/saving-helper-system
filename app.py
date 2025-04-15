@@ -241,6 +241,30 @@ def update_transaction_by_id(transaction_id):
         return redirect(url_for('login'))
     return redirect(url_for('login'))
 
+@app.route('/repayment_loan_by_transaction_id/<string:transaction_id>', methods=['POST'])
+def repayment_loan_by_transaction_id(transaction_id):
+    if 'user_id' in session:
+        if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
+            flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
+            return redirect(url_for('saving_deport'))
+        
+        current_date = datetime.date.today()
+        req = {
+            "transaction_id": transaction_id,
+            "repay_date": current_date.strftime('%Y-%m-%d'),
+            "repay_amount": request.json.get("repay_amount"),
+            "repay_desc": request.json.get("repay_desc"),
+            "channel_id": channel_id
+        }
+        print(req)
+        resp = RestConnector.internal_app_api('saving', 'repay_loan', req, "POST")
+        if resp:
+            if resp.status_code == 200:
+                return resp.json()
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
+        return redirect(url_for('login'))
+    return redirect(url_for('login'))
+
 @app.route('/report')
 def report():
     if 'user_id' in session:

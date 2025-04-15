@@ -1,5 +1,8 @@
 {% extends 'header.html' %}
 {% block content %}
+
+<link href="../static/css/repay_loan.css" rel="stylesheet">
+
 <main id="main" class="main">
 
     <div class="pagetitle">
@@ -56,14 +59,36 @@
                                     <tr class="transaction-row" data-transaction-type="{{ txn_detail.transaction_type }}">
                                         <td>{{ txn_detail.transaction_date }}</td>
                                         <td class="text-center"><b>{{ txn_detail.amount }}</b>
-                                            {% if txn_detail.transaction_type == 'loan' %}
-                                            &nbsp;&nbsp;
+                                            {% if txn_detail.is_completed %}
+                                                &nbsp;&nbsp;
                                                 <a href="#" data-id="{{ txn_detail.transaction_id }}"
                                                 data-amount="{{ txn_detail.amount }}" data-transaction_date="{{ txn_detail.transaction_date }}"
                                                 data-currency_type="{{ txn_detail.currency_type }}" data-transaction_desc="{{ txn_detail.transaction_desc }}"
-                                                data-transaction_type="{{ txn_detail.transaction_type }}" onclick="console.error(''error');">
-                                                <span class="badge bg-danger animated-shark-item"> មិនទាន់សង -{{ txn_detail.remain_balance }}$</span>
+                                                data-transaction_type="{{ txn_detail.transaction_type }}"
+                                                
+                                                onclick='showRepayDetails({{ txn_detail.repay_loan_details | tojson }},
+                                                "{{ txn_detail.currency_type }}",
+                                                "{{ txn_detail.transaction_id }}",
+                                                "{{ txn_detail.remain_balance }}");'>
+
+                                                <span class="badge bg-success animated-shark-item"> សងរួចរាល់ </span>
                                                 </a>
+                                            {% else %}
+                                                {% if txn_detail.transaction_type == 'loan' %}
+                                                    &nbsp;&nbsp;
+                                                        <a href="#" data-id="{{ txn_detail.transaction_id }}"
+                                                        data-amount="{{ txn_detail.amount }}" data-transaction_date="{{ txn_detail.transaction_date }}"
+                                                        data-currency_type="{{ txn_detail.currency_type }}" data-transaction_desc="{{ txn_detail.transaction_desc }}"
+                                                        data-transaction_type="{{ txn_detail.transaction_type }}"
+                                                        
+                                                        onclick='showRepayDetails({{ txn_detail.repay_loan_details | tojson }},
+                                                        "{{ txn_detail.currency_type }}",
+                                                        "{{ txn_detail.transaction_id }}",
+                                                        "{{ txn_detail.remain_balance }}");'>
+
+                                                        <span class="badge bg-danger animated-shark-item"> មិនទាន់សង -{{ txn_detail.remain_balance }}$</span>
+                                                        </a>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                         <td><span class="badge bg-info animated-badge">{{ txn_detail.currency_type }}</span></td>
@@ -111,12 +136,6 @@
                             </table>
                         </div>
                         <!-- End Table with stripped rows -->
-
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transactionListModal">
-                            View Loan Repayment Transactions
-                          </button>
-                          
-
                     </div>
                 </div>
             </div>
@@ -191,44 +210,77 @@
         </div>
     </div>
 
-    <div class="modal fade" id="transactionListModal" tabindex="-1" aria-labelledby="transactionListModalLabel"
-        aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="transactionListModalLabel">បញ្ជីប្រតិបត្ដិការ សងប្រាក់កម្ចី</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Alert Messages -->
-                <div id="alertMessage" class="alert d-none" role="alert"></div>
+    <div class="modal fade" id="repayListModal" tabindex="-1" aria-labelledby="repayListModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="repayListModalLabel">បញ្ជីប្រតិបត្ដិការ សងប្រាក់កម្ចី</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
 
-                <!-- Transaction List Table -->
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col">លេខប្រតិបត្ដិការប្រាក់កម្ចី</th>
-                            <th scope="col">កាលបរិច្ឆេទ</th>
-                            <th scope="col">ចំនួនទឹកប្រាក់សង</th>
-                            <th scope="col">ប្រភេទសាច់ប្រាក់</th>
-                            <th scope="col">កំណត់សម្គាល់</th>
-                            <th scope="col">កំណត់បញ្ជា</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transactionList">
-                        <!-- Dynamic List of Loan Repayments will go here -->
-                    </tbody>
-                </table>
+                    <!-- Remaining Balance Circle -->
+                    <div class="d-flex justify-content-center mb-4">
+                        <div class="balance-circle shadow-sm">
+                            <div class="text-center">
+                                <div class="fw-bold text-primary">Remaining Balance</div>
+                                <div id="remainingBalanceLabel" class="fs-4 text-danger">0 USD</div>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- No data available message -->
-                <div id="noDataMessage" class="d-none text-center">
-                    <p>មិនមានទិន្នន័យប្រតិបត្ដិការទេ</p> <!-- "No transaction data available" -->
+                    <input type="hidden" class="form-control" id="transactionId" placeholder="" />
+                    <input type="hidden" class="form-control" id="remainingBalance" placeholder="" />
+
+                    <!-- Make Repayment Input Section -->
+                    <div id="repaymentForm" class="card shadow-sm mb-4 p-3 d-none">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-4">
+                                <label for="repaymentAmount" class="form-label">ចំនួនទឹកប្រាក់សង</label>
+                                <input type="number" class="form-control" id="repaymentAmount" placeholder="" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="repaymentDesc" class="form-label">កំណត់សម្គាល់</label>
+                                <input type="text" class="form-control" id="repaymentDesc" placeholder="note..." />
+                            </div>
+                            <div class="col-md-2 d-grid">
+                                <label class="form-label invisible">Submit</label>
+                                <button type="button" class="btn btn-primary" id="submitRepaymentBtn">
+                                    <i class="bi bi-check-circle me-1"></i>រក្សាទុក
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <!-- Left: History Toggle -->
+                        <button type="button" class="btn btn-outline-secondary" id="toggleHistoryBtn">
+                            <i class="bi bi-eye-slash me-1"></i> បិទបញ្ជីប្រវត្តិសងប្រាក់
+                        </button>
+
+                        <!-- Right: Make Repayment -->
+                        <button type="button" class="btn btn-success" id="makeRepaymentBtn">
+                            <i class="bi bi-plus-circle me-1"></i> បញ្ចូលការសងប្រាក់
+                        </button>
+                    </div>
+    
+                    <!-- Alert Messages -->
+                    <div id="alertMessageRepay" class="alert d-none" role="alert"></div>
+    
+                    <!-- Repayment History List (iOS-style) -->
+                    <div id="repayList" class="list-group d-none">
+                        <!-- Dynamic items will be inserted here -->
+                    </div>
+                    <!-- No data available message -->
+                    <div id="noDataMessage" class="d-none text-center mt-3">
+                        <p class="">មិនមានទិន្នន័យប្រតិបត្ដិការទេ</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
+    
 
 </main><!-- End #main -->
 
@@ -388,92 +440,147 @@
 
 
 <script>
-    // Example data - in practice, this could come from an API or database
-    const transactions = [
-        {
-            transaction_id: 'TRX123',
-            transaction_date: '2025-04-06',
-            amount: 500,
-            currency_type: 'USD',
-            transaction_desc: 'Loan repayment for April'
-        },
-        {
-            transaction_id: 'TRX124',
-            transaction_date: '2025-03-20',
-            amount: 300,
-            currency_type: 'KHR',
-            transaction_desc: 'Loan repayment for March'
-        },
-        {
-            transaction_id: 'TRX124',
-            transaction_date: '2025-03-20',
-            amount: 300,
-            currency_type: 'KHR',
-            transaction_desc: 'Loan repayment for March'
-        },
-        {
-            transaction_id: 'TRX124',
-            transaction_date: '2025-03-20',
-            amount: 300,
-            currency_type: 'KHR',
-            transaction_desc: 'Loan repayment for March'
-        }
-    ];
 
-    // Function to load the transaction data into the table
-    function loadTransactionList() {
-        console.log("loadTransactionList");
-        const transactionList = document.getElementById('transactionList');
+    async function showRepayDetails(repayDetails, currency_type, transaction_id, remain_balance) {
+        const repayList = document.getElementById('repayList');
         const noDataMessage = document.getElementById('noDataMessage');
+        const remainingBalanceLabel = document.getElementById('remainingBalanceLabel');
+        const toggleHistoryBtn = document.getElementById("toggleHistoryBtn");
+        const transactionId = document.getElementById("transactionId");
+        const remainingBalance = document.getElementById("remainingBalance");
+    
+        // Clear old content
+        repayList.innerHTML = '';
 
-        // If no transactions exist
-        if (transactions.length === 0) {
-            noDataMessage.classList.remove('d-none');
+        transactionId.value = transaction_id;
+        remainingBalance.value = remain_balance;
+    
+        // Show/hide based on data
+        if (!repayDetails || repayDetails.length === 0) {
+            repayList.classList.add("d-none");
+            noDataMessage.classList.remove("d-none");
+            toggleHistoryBtn?.classList.add("d-none");
+        } else {
+            repayList.classList.remove("d-none");
+            noDataMessage.classList.add("d-none");
+            toggleHistoryBtn?.classList.remove("d-none");
+    
+            // Generate new content
+            repayDetails.forEach(transaction => {
+                const item = document.createElement('div');
+                item.className = "list-group-item list-group-item-action d-flex justify-content-between align-items-start";
+    
+                item.innerHTML = `
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">${transaction.repay_date}</div>
+                        <small class="text-muted">${transaction.repay_desc || '—'}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success rounded-pill mb-2">+${Number(transaction.repay_amount).toLocaleString()} ${currency_type}</span><br/>
+                        <button class="btn btn-sm btn-outline-primary me-1" disabled onclick="editTransaction('${transaction.repay_id}')">កែប្រែ</button>
+                        <button class="btn btn-sm btn-outline-danger" disabled onclick="deleteTransaction('${transaction.repay_id}')">លុប</button>
+                    </div>
+                `;
+    
+                repayList.appendChild(item);
+            });
+        }
+    
+        // Set remaining balance
+        remainingBalanceLabel.innerHTML = '-' + remain_balance + ' ' + currency_type;
+    
+        // Show the modal
+        $('#repayListModal').modal('show');
+    }
+    
+
+    document.getElementById("toggleHistoryBtn").addEventListener("click", function () {
+        const repayTable = document.getElementById('repayList');
+        const noData = document.getElementById("noDataMessage");
+    
+        const isHidden = repayTable.classList.contains("d-none");
+    
+        if (isHidden) {
+            repayTable.classList.remove("d-none");
+            this.innerHTML = `<i class="bi bi-eye-slash me-1"></i> បិទបញ្ជីប្រវត្តិសងប្រាក់`;
+        } else {
+            repayTable.classList.add("d-none");
+            this.innerHTML = `<i class="bi bi-eye me-1"></i> បង្ហាញបញ្ជីប្រវត្តិសងប្រាក់`;
+        }
+    });
+
+    document.getElementById("makeRepaymentBtn").addEventListener("click", function () {
+        const form = document.getElementById("repaymentForm");
+        form.classList.toggle("d-none");
+    });
+
+    document.getElementById("submitRepaymentBtn").addEventListener("click", async () => {
+        const repayment_amount = document.getElementById("repaymentAmount").value;
+        const repayment_desc = document.getElementById("repaymentDesc").value;
+        const transactionId = document.getElementById("transactionId").value;
+        const remainingBalance = document.getElementById("remainingBalance").value;
+
+        const alertMessageRepay = document.getElementById("alertMessageRepay");
+        const submitRepaymentBtn = document.getElementById("submitRepaymentBtn");
+        const loadingIndicator = document.getElementById("loading");
+        loadingIndicator.classList.remove("d-none");
+        submitRepaymentBtn.disabled = true;
+        alertMessageRepay.classList.add("d-none");
+    
+        if (!repayment_amount || Number(repayment_amount) <= 0) {
+            alertMessageRepay.classList.remove("d-none");
+            alertMessageRepay.classList.add("alert-danger");
+            alertMessageRepay.textContent = 'សូមបញ្ចូលចំនួនប្រាក់សងត្រឹមត្រូវ';
+            return;
             return;
         }
 
-        // Hide no data message
-        noDataMessage.classList.add('d-none');
-
-        // Clear the current table content
-        transactionList.innerHTML = '';
-
-        // Populate the table with transactions
-        transactions.forEach(transaction => {
-            const row = document.createElement('tr');
-            
-            row.innerHTML = `
-                <td>${transaction.transaction_id}</td>
-                <td>${transaction.transaction_date}</td>
-                <td>${transaction.amount}</td>
-                <td>${transaction.currency_type}</td>
-                <td>${transaction.transaction_desc}</td>
-                <td>
-                    <button class="btn btn-info btn-sm" onclick="editTransaction('${transaction.transaction_id}')">Edit</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteTransaction('${transaction.transaction_id}')">Delete</button>
-                </td>
-            `;
-            transactionList.appendChild(row);
-        });
-    }
-
-    // Edit transaction function (example)
-    function editTransaction(transactionId) {
-        alert('Edit transaction: ' + transactionId);
-        // Add functionality to edit the transaction here
-    }
-
-    // Delete transaction function (example)
-    function deleteTransaction(transactionId) {
-        if (confirm('Are you sure you want to delete this transaction?')) {
-            // Add functionality to delete the transaction here
-            alert('Transaction ' + transactionId + ' deleted');
+        if (Number(repayment_amount) > remainingBalance) {
+            alertMessageRepay.classList.remove("d-none");
+            alertMessageRepay.classList.add("alert-danger");
+            alertMessageRepay.textContent = 'ចំនួនប្រាក់សងលើសកម្ចីដែលនៅសល់';
+            return;
         }
-    }
 
-    // Load the transaction list when the modal is shown
-    const transactionListModal = document.getElementById('transactionListModal');
-    transactionListModal.addEventListener('show.bs.modal', loadTransactionList);
+        const data = {
+            "repay_amount": repayment_amount,
+            "repay_desc": repayment_desc
+        }
+
+        const response = await fetch(`/repayment_loan_by_transaction_id/${transactionId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            const jsonResponse = await response.json();
+            if (jsonResponse.status === 0) {
+                alertMessageRepay.classList.remove("d-none");
+                alertMessageRepay.classList.add("alert-success");
+                alertMessageRepay.textContent = jsonResponse.message;
+                location.reload();
+            } else {
+                alertMessageRepay.classList.remove("d-none");
+                alertMessageRepay.classList.add("alert-danger");
+                alertMessageRepay.textContent = jsonResponse.message;
+            }
+            submitButton.disabled = false;
+            loadingIndicator.classList.add("d-none");
+        } else {
+            alert('Failed to update transaction.');
+        }
+    
+        // Clear and hide form
+        document.getElementById("repaymentAmount").value = '';
+        document.getElementById("repaymentDesc").value = '';
+        document.getElementById("repaymentForm").classList.add("d-none");
+    
+        // Optional: show confirmation or update UI
+    });
+
 </script>
 
 {% endblock %}

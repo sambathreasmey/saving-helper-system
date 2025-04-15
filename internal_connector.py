@@ -32,7 +32,7 @@ class RestConnector:
             token_data = response.json()
             RestConnector.access_token = token_data['access_token']
             RestConnector.refresh_token = token_data.get('refresh_token')
-            RestConnector.token_expiry = time.time() + token_data.get('expires_at', 3600) - 60
+            RestConnector.token_expiry = token_data.get('expires_at')
         except Exception as e:
             print(f"Failed to obtain new tokens: {e}")
             RestConnector.access_token = None
@@ -50,7 +50,7 @@ class RestConnector:
             token_data = response.json()
             RestConnector.access_token = token_data['access_token']
             RestConnector.refresh_token = token_data.get('refresh_token', RestConnector.refresh_token)
-            RestConnector.token_expiry = time.time() + token_data.get('expires_at', 3600) - 60
+            RestConnector.token_expiry = token_data.get('expires_at')
         except Exception as e:
             print(f"Failed to refresh access token: {e}")
             RestConnector.access_token = None
@@ -58,8 +58,10 @@ class RestConnector:
     @staticmethod
     def ensure_token_valid():
         if not RestConnector.access_token:
+            print('calling to access_token >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
             RestConnector.get_new_tokens()
         elif time.time() >= RestConnector.token_expiry:
+            print('calling to refresh_access_token >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
             RestConnector.refresh_access_token()
         return RestConnector.access_token is not None
 

@@ -1,0 +1,23 @@
+.balance-circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    /* background-color: #f8f9fa; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 12px solid #005eff;
+}
+
+.list-group-item {
+    background-color: #ffffffc9;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+}
+.list-group-item:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
