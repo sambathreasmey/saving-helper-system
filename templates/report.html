@@ -55,6 +55,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% txn_details = txn_details.objects.filter(is_completed=False) %}
                                     {% for txn_detail in txn_details %}
                                     <tr class="transaction-row" data-transaction-type="{{ txn_detail.transaction_type }}">
                                         <td>{{ txn_detail.transaction_date }}</td>
