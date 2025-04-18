@@ -284,6 +284,8 @@ def report():
                 data = res.json()
                 if data:
                     txn_details = data['data']  # Fetch all users from the database
+                    if report_type in 'loan':
+                        txn_details = txn_details.query.filter_by(is_completed=False).all()
                     return render_template('report.html', txn_details=txn_details, is_general=is_general)
         flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
         return redirect(url_for('login'))
