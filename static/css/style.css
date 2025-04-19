@@ -18,7 +18,7 @@
 }
 
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Battambang", sans-serif !important;
   background: #f6f9ff;
   color: #444444;
 }
@@ -39,7 +39,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Nunito", sans-serif;
+  font-family: "Battambang", sans-serif;
 }
 
 /*--------------------------------------------------------------
@@ -256,7 +256,7 @@ h6 {
   font-size: 18px;
   font-weight: 500;
   color: #ffffff;
-  font-family: "Poppins", sans-serif;
+  font-family: "Battambang", sans-serif;
 }
 
 .datatable-search .datatable-input {
@@ -310,7 +310,7 @@ h6 {
 /* Alerts */
 .alert-heading {
   font-weight: 500;
-  font-family: "Poppins", sans-serif;
+  font-family: "Battambang", sans-serif;
   font-size: 20px;
 }
 
@@ -363,7 +363,7 @@ h6 {
 /* Breadcrumbs */
 .breadcrumb {
   font-size: 14px;
-  font-family: "Nunito", sans-serif;
+  font-family: "Battambang", sans-serif;
   color: #899bbd;
   font-weight: 600;
 }
