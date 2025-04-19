@@ -392,7 +392,7 @@ def user_login():
             else:
                 return jsonify(data)
 
-@app.route('/redirect')
+@app.route('/redirect', methods=['GET'])
 def redirect():
     payment_result = request.args.get('_paymentresult', '')
     result_code = request.args.get('_resultCode', '')
