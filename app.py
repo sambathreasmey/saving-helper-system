@@ -52,43 +52,88 @@ class LoginForm(FlaskForm):
     password = PasswordField("ពាក្យសម្ងាត់",validators=[DataRequired()])
     submit = SubmitField("ចូលគណនី")
 
+# @app.route('/')
+# def index():
+#     if 'user_id' in session:
+#         user_id = session['user_id']
+
+#         req = {
+#             "channel_id": channel_id
+#         }
+#         res = RestConnector.internal_app_api('partner', 'retrive_user', req, "POST")
+#         if res:
+#             if res.status_code == 200:
+#                 data = res.json()
+#                 if data:
+#                     users = data['data']
+#                     user_detail = None
+#                     for user in users:
+#                         if user['user_name'] == user_id:
+#                             user_detail = user
+                
+#                     req = {
+#                         "channel_id": channel_id
+#                     }
+#                     #get transactions detail
+#                     res = RestConnector.internal_app_api('saving', 'transaction_detail', req, "POST")
+#                     if res.status_code == 200:
+#                         data = res.json()
+#                         if data:
+#                             txn_details = data['data']
+#                     #get dashboard
+#                     res_dashboard = RestConnector.internal_app_api('saving', 'dashboard', req, "POST")
+#                     if res_dashboard.status_code == 200:
+#                         data = res_dashboard.json()
+#                         if data:
+#                             dashboard = data['dashboard']
+#                     return render_template('index.html', total_user=len(users), txn_details=txn_details, dashboard=dashboard)
+#         flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+#         return redirect(url_for('login'))
+#     return redirect(url_for('login'))
+
 @app.route('/')
 def index():
-    if 'user_id' in session:
-        user_id = session['user_id']
-
-        req = {
-            "channel_id": channel_id
-        }
-        res = RestConnector.internal_app_api('partner', 'retrive_user', req, "POST")
-        if res:
-            if res.status_code == 200:
-                data = res.json()
-                if data:
-                    users = data['data']
-                    user_detail = None
-                    for user in users:
-                        if user['user_name'] == user_id:
-                            user_detail = user
-                
-                    req = {
-                        "channel_id": channel_id
-                    }
-                    #get transactions detail
-                    res = RestConnector.internal_app_api('saving', 'transaction_detail', req, "POST")
-                    if res.status_code == 200:
-                        data = res.json()
-                        if data:
-                            txn_details = data['data']
-                    #get dashboard
-                    res_dashboard = RestConnector.internal_app_api('saving', 'dashboard', req, "POST")
-                    if res_dashboard.status_code == 200:
-                        data = res_dashboard.json()
-                        if data:
-                            dashboard = data['dashboard']
-                    return render_template('index.html', total_user=len(users), txn_details=txn_details, dashboard=dashboard)
-        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
+    if 'user_id' not in session:
         return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    user_detail = None
+    txn_details = []
+    dashboard = {}
+
+    # Retrieve users
+    req = {"channel_id": channel_id}
+    res = RestConnector.internal_app_api('partner', 'retrive_user', req, "POST")
+
+    if res and res.status_code == 200:
+        data = res.json()
+        users = data.get('data', [])
+
+        for user in users:
+            if user.get('user_name') == user_id:
+                user_detail = user
+                break  # user found
+
+        # Get transaction details
+        res_txn = RestConnector.internal_app_api('saving', 'transaction_detail', req, "POST")
+        if res_txn and res_txn.status_code == 200:
+            txn_data = res_txn.json()
+            txn_details = txn_data.get('data', [])
+
+        # Get dashboard info
+        res_dashboard = RestConnector.internal_app_api('saving', 'dashboard', req, "POST")
+        if res_dashboard and res_dashboard.status_code == 200:
+            dash_data = res_dashboard.json()
+            dashboard = dash_data.get('dashboard', {})
+
+        return render_template(
+            'index.html',
+            total_user=len(users),
+            txn_details=txn_details,
+            dashboard=dashboard
+        )
+
+    flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ")
     return redirect(url_for('login'))
 
 @app.route('/saving_deport', methods=['GET','POST'])
