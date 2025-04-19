@@ -392,11 +392,11 @@ def user_login():
             else:
                 return jsonify(data)
 
-# @app.route('/redirect')
-# def redirect():
-#     payment_result = request.args.get('_paymentresult', '')
-#     result_code = request.args.get('_resultCode', '')
-#     return render_template('redirect.html', payment_result=payment_result, result_code=result_code)
+@app.route('/redirect')
+def redirect():
+    payment_result = request.args.get('_paymentresult', '')
+    result_code = request.args.get('_resultCode', '')
+    return render_template('redirect.html', payment_result=payment_result, result_code=result_code)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
