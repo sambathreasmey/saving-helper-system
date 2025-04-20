@@ -209,41 +209,41 @@ def loan():
         return render_template('loan.html', form=form)
     return redirect(url_for('login'))
 
-@app.route('/loan_repay', methods=['GET','POST'])
-def loan_repay():
-    if 'user_id' in session:
-        form = LoanRepayForm()
-        if form.validate_on_submit():
-            if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
-                flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
-                return redirect(url_for('saving_deport'))
-            amount = form.amount.data
-            currencyType = form.currencyType.data
-            date = form.date.data
-            desc = form.desc.data
-            req = {
-                "transaction_date": date.strftime('%Y-%m-%d'),
-                "amount": amount,
-                "transaction_desc": desc,
-                "user_id": session['user_id'],
-                "currency_type": currencyType,
-                "transaction_type": "loan_repay",
-                "channel_id": channel_id
-            }
-            resp = RestConnector.internal_app_api('saving', 'deposit', req, "POST")
-            if resp:
-                if resp.status_code == 200:
-                    data = resp.json()
-                    if data and data['status'] == 0:
-                        flash("ប្រតិបត្តិការទទួលបានជោគជ័យ", 'success')
-                        return redirect(url_for('loan_repay'))
-                    else:
-                        flash(data['message'], 'danger')
-                        return redirect(url_for('loan_repay'))
-            flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
-            return redirect(url_for('login'))
-        return render_template('loan_repay.html', form=form)
-    return redirect(url_for('login'))
+# @app.route('/loan_repay', methods=['GET','POST'])
+# def loan_repay():
+#     if 'user_id' in session:
+#         form = LoanRepayForm()
+#         if form.validate_on_submit():
+#             if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
+#                 flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
+#                 return redirect(url_for('saving_deport'))
+#             amount = form.amount.data
+#             currencyType = form.currencyType.data
+#             date = form.date.data
+#             desc = form.desc.data
+#             req = {
+#                 "transaction_date": date.strftime('%Y-%m-%d'),
+#                 "amount": amount,
+#                 "transaction_desc": desc,
+#                 "user_id": session['user_id'],
+#                 "currency_type": currencyType,
+#                 "transaction_type": "loan_repay",
+#                 "channel_id": channel_id
+#             }
+#             resp = RestConnector.internal_app_api('saving', 'deposit', req, "POST")
+#             if resp:
+#                 if resp.status_code == 200:
+#                     data = resp.json()
+#                     if data and data['status'] == 0:
+#                         flash("ប្រតិបត្តិការទទួលបានជោគជ័យ", 'success')
+#                         return redirect(url_for('loan_repay'))
+#                     else:
+#                         flash(data['message'], 'danger')
+#                         return redirect(url_for('loan_repay'))
+#             flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
+#             return redirect(url_for('login'))
+#         return render_template('loan_repay.html', form=form)
+#     return redirect(url_for('login'))
 
 @app.route('/delete_transaction_by_id/<string:transaction_id>', methods=['DELETE'])
 def delete_transaction_by_id(transaction_id):
@@ -256,6 +256,28 @@ def delete_transaction_by_id(transaction_id):
             "channel_id": channel_id
         }
         resp = RestConnector.internal_app_api('saving', 'delete_transaction_by_id', req, "DELETE")
+        if resp:
+            if resp.status_code == 200:
+                return resp.json()
+        flash("ប្រព័ន្ធមានបញ្ហារអាក់រអួល សូមព្យាយាមពេលក្រោយ", 'danger')
+        return redirect(url_for('login'))
+    return redirect(url_for('login'))
+
+@app.route('/delete_repay_loan_by_id/<string:repay_id>', methods=['DELETE'])
+def delete_repay_loan_by_id(repay_id):
+    if 'user_id' in session:
+        if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
+            flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
+            return redirect(url_for('saving_deport'))
+        
+        data = request.get_json()
+        transaction_id = data.get('transaction_id')
+        req = {
+            "repay_id": repay_id,
+            "transaction_id": transaction_id,
+            "channel_id": channel_id
+        }
+        resp = RestConnector.internal_app_api('saving', 'delete_repay_loan_by_id', req, "DELETE")
         if resp:
             if resp.status_code == 200:
                 return resp.json()
