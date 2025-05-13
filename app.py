@@ -33,12 +33,20 @@ class SavingDepositForm(FlaskForm):
     isMoreDeposit = BooleanField("បន្ថែមលើប្រតិបត្តិចាស់ក្នុងថ្ងៃ")
     submit = SubmitField("បញ្ចូល")
 
+    def apply_role(self, roles):
+        if 'READER' in roles:
+            self.submit.render_kw = {'disabled': True}
+
 class LoanForm(FlaskForm):
     amount = StringField("ទំហំសាច់ប្រាក់", validators=[DataRequired()])
     currencyType = SelectField('ប្រភេទសាច់ប្រាក់', choices=[('USD', 'USD'), ('USD', 'KHR')])
     date = DateField('កាលបរិច្ឆេទ', format='%Y-%m-%d', default=datetime.date.today, validators=[DataRequired()])
     desc = StringField("មូលហេតុ")
     submit = SubmitField("បញ្ចូល")
+
+    def apply_role(self, roles):
+        if 'READER' in roles:
+            self.submit.render_kw = {'disabled': True}
 
 class LoanRepayForm(FlaskForm):
     amount = StringField("ទំហំសាច់ប្រាក់សង", validators=[DataRequired()])
@@ -95,25 +103,18 @@ class LoginForm(FlaskForm):
 def index():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-
-    user_id = session['user_id']
-    user_detail = None
+    
+    user_name = session['user_id']
     txn_details = []
     dashboard = {}
 
     # Retrieve users
-    req = {"channel_id": channel_id}
-    res = RestConnector.internal_app_api('partner', 'retrive_user', req, "POST")
+    req = {"user_name": user_name}
+    res = RestConnector.internal_app_api('saving', 'get_user_by_username', req, "GET")
 
     if res and res.status_code == 200:
-        data = res.json()
-        users = data.get('data', [])
 
-        for user in users:
-            if user.get('user_name') == user_id:
-                user_detail = user
-                break  # user found
-
+        req = {"channel_id": "sambathreasmey"}
         # Get transaction details
         res_txn = RestConnector.internal_app_api('saving', 'transaction_detail', req, "POST")
         if res_txn and res_txn.status_code == 200:
@@ -128,7 +129,7 @@ def index():
 
         return render_template(
             'index.html',
-            total_user=len(users),
+            total_user=1,
             txn_details=txn_details,
             dashboard=dashboard
         )
@@ -140,8 +141,10 @@ def index():
 def saving_deport():
     if 'user_id' in session:
         form = SavingDepositForm()
+        roles = session['user_detail']['roles']
+        form.apply_role(roles)
         if form.validate_on_submit():
-            if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
+            if request.method == 'POST' and 'WRITER' not in roles:
                 flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
                 return redirect(url_for('saving_deport'))
             amount = form.amount.data
@@ -177,8 +180,10 @@ def saving_deport():
 def loan():
     if 'user_id' in session:
         form = LoanForm()
+        roles = session['user_detail']['roles']
+        form.apply_role(roles)
         if form.validate_on_submit():
-            if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
+            if request.method == 'POST' and 'WRITER' not in roles:
                 flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
                 return redirect(url_for('saving_deport'))
             amount = form.amount.data
@@ -248,7 +253,8 @@ def loan():
 @app.route('/delete_transaction_by_id/<string:transaction_id>', methods=['DELETE'])
 def delete_transaction_by_id(transaction_id):
     if 'user_id' in session:
-        if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
+        roles = session['user_detail']['roles']
+        if request.method == 'DELETE' and 'WRITER' not in roles:
             flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
             return redirect(url_for('saving_deport'))
         req = {
@@ -266,7 +272,8 @@ def delete_transaction_by_id(transaction_id):
 @app.route('/delete_repay_loan_by_id/<string:repay_id>', methods=['DELETE'])
 def delete_repay_loan_by_id(repay_id):
     if 'user_id' in session:
-        if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
+        roles = session['user_detail']['roles']
+        if request.method == 'DELETE' and 'WRITER' not in roles:
             flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
             return redirect(url_for('saving_deport'))
         
@@ -288,7 +295,8 @@ def delete_repay_loan_by_id(repay_id):
 @app.route('/update_transaction_by_id/<string:transaction_id>', methods=['PUT'])
 def update_transaction_by_id(transaction_id):
     if 'user_id' in session:
-        if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
+        roles = session['user_detail']['roles']
+        if request.method == 'PUT' and 'WRITER' not in roles:
             flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
             return redirect(url_for('saving_deport'))
         req = {
@@ -311,7 +319,8 @@ def update_transaction_by_id(transaction_id):
 @app.route('/repayment_loan_by_transaction_id/<string:transaction_id>', methods=['POST'])
 def repayment_loan_by_transaction_id(transaction_id):
     if 'user_id' in session:
-        if session['user_detail']['email_address'] not in ['engsoknai471@gmail.com', 'reasmeysambath@gmail.com']:
+        roles = session['user_detail']['roles']
+        if request.method == 'POST' and 'WRITER' not in roles:
             flash("អ្នកពុំមានសិទ្ធិក្នុងការបញ្ចូលទេ!", 'danger')
             return redirect(url_for('saving_deport'))
         
@@ -401,7 +410,7 @@ def login():
             "user_name": username,
             "password": password
         }
-        res = RestConnector.internal_app_api('partner', 'user_login', req, "POST")
+        res = RestConnector.internal_app_api('saving', 'login', req, "POST")
         if res:
             if res.status_code == 200:
                 data = res.json()
@@ -458,12 +467,6 @@ def user_login():
                 return jsonify(data)
             else:
                 return jsonify(data)
-
-# @app.route('/redirect', methods=['GET'])
-# def redirect():
-#     payment_result = request.args.get('_paymentresult', '')
-#     result_code = request.args.get('_resultCode', '')
-#     return render_template('redirect.html', payment_result=payment_result, result_code=result_code)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)

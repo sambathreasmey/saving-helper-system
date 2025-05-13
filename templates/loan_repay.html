@@ -73,7 +73,12 @@
                 </div>
                 <div class="item-right">
                   <button type="reset" class="btn btn-secondary">សម្អាត</button>
-                  {{ form.submit(class="btn btn-primary animated-button") }}
+                  {% if 'READER' in roles %}
+                    {{ form.submit(class="btn btn-primary animated-button", disabled=True) }}
+                  {% else %}
+                    {{ form.submit(class="btn btn-primary animated-button") }}
+                  {% endif %}
+
                 </div>
               </form><!-- End floating Labels Form -->
 

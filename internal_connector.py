@@ -81,7 +81,7 @@ class RestConnector:
         try:
             match method.upper():
                 case "GET":
-                    response = requests.get(url, params=request_data, headers=headers)
+                    response = requests.get(url, json=request_data, headers=headers)
                 case "POST":
                     response = requests.post(url, json=request_data, headers=headers)
                 case "PUT":
