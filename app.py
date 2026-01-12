@@ -8,10 +8,12 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 
 from internal_connector import RestConnector
+import invitation_card
 
 #Load environment
 load_dotenv()
 secret_key = os.getenv('app.secret_key')
+bot_token = os.getenv('telegram.token')
 channel_id = "sambathreasmey"
 
 app = Flask(__name__)
@@ -467,6 +469,23 @@ def user_login():
                 return jsonify(data)
             else:
                 return jsonify(data)
+    
+@app.route(f'/{bot_token}', methods=['POST'])
+def webhook():
+    data = request.get_json()
+
+    if 'message' in data:
+        chat_id = data['message']['chat']['id']
+        user_id = data['message']['from']['id']
+        text = data['message'].get('text', '')
+
+        if text.startswith('invitation_card:'):
+            parts = text.split(':', 1)
+            if len(parts) > 1 and parts[1] != "":
+                is_sent, saved_path = invitation_card.generate(parts[1])
+                if is_sent:
+                    invitation_card.sent(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
+    return {"message": "success", "code": 0, "status": 0}, 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
