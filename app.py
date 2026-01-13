@@ -470,6 +470,7 @@ def user_login():
             else:
                 return jsonify(data)
     
+active_users = set()
 @app.route(f'/{bot_token}', methods=['POST'])
 def webhook():
     data = request.get_json()
@@ -479,13 +480,25 @@ def webhook():
         user_id = data['message']['from']['id']
         text = data['message'].get('text', '')
 
-        if text.startswith('invitation_card:'):
-            parts = text.split(':', 1)
-            if len(parts) > 1 and parts[1] != "":
-                is_sent, saved_path = invitation_card.generate(parts[1])
+        if text == '/start':
+            active_users.add(user_id)
+            invitation_card.sentMessage(chat_id=chat_id, text_message="សូមផ្ញើឈ្មោះអ្នកដែលចង់អញ្ចើញ 🐙", bot_token=bot_token)
+            return {"message": "success", "code": 0, "status": 0}, 200
+
+        elif text == '/stop':
+            if user_id in active_users:
+                active_users.remove(user_id)
+                invitation_card.sentMessage(chat_id=chat_id, text_message="សូមអរគុណសម្រាប់ការប្រើប្រាស់ 😍", bot_token=bot_token)
+            return {"message": "success", "code": 0, "status": 0}, 200
+        
+        if user_id in active_users:
+            if len(text) > 1 and text != "":
+                is_sent, saved_path = invitation_card.generate(text)
                 if is_sent:
-                    invitation_card.sent(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
+                    invitation_card.sentImage(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
+                else:
+                    invitation_card.sentMessage(chat_id=chat_id, text_message="ព័ត៏មានពុំត្រឹមត្រូវ សូមព្យាយាមម្ដងទៀត 😢", bot_token=bot_token)
     return {"message": "success", "code": 0, "status": 0}, 200
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=5000)
