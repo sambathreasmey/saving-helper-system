@@ -75,7 +75,7 @@ def sentMessage(chat_id, text_message, bot_token):
     payload = {"chat_id": chat_id, "text": text_message}
     try:
         requests.post(action_url, json=action_payload)
-        time.sleep(1)
+        time.sleep(0.3)
         response = requests.get(url, data=payload)
         return response.json()
     except Exception as e:
