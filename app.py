@@ -482,22 +482,27 @@ def webhook():
 
         if text == '/start':
             active_users.add(user_id)
-            invitation_card.sentMessage(chat_id=chat_id, text_message="សូមផ្ញើឈ្មោះអ្នកដែលចង់អញ្ចើញ 🐙", bot_token=bot_token)
+            invitation_card.sentMessage(chat_id=chat_id, text_message="តោះ! ចាប់ផ្ដើមរចនាទាំងអស់គ្នា... ✨ សូមមេត្តាផ្ញើឈ្មោះដែលអ្នកចង់ដាក់លើកាតមកណា៎ 🎨✍️", bot_token=bot_token)
             return {"message": "success", "code": 0, "status": 0}, 200
 
         elif text == '/stop':
             if user_id in active_users:
                 active_users.remove(user_id)
-                invitation_card.sentMessage(chat_id=chat_id, text_message="សូមអរគុណសម្រាប់ការប្រើប្រាស់ 😍", bot_token=bot_token)
+                invitation_card.sentMessage(chat_id=chat_id, text_message="រួចរាល់ហើយបាទ! ✨ សូមអរគុណច្រើនសម្រាប់ការប្រើប្រាស់សេវាកម្មរបស់ខ្ញុំ 💖 សង្ឃឹមថាអ្នកនឹងពេញចិត្តកាតនេះណា៎! 🌸🍃", bot_token=bot_token)
             return {"message": "success", "code": 0, "status": 0}, 200
         
         if user_id in active_users:
             if len(text) > 1 and text != "":
+                waiting_message = invitation_card.sentMessage(chat_id=chat_id, text_message="✨ សូមមេត្តារង់ចាំបន្តិចណា៎... 🐻‍❄️កំពុងរៀបចំជូនយ៉ាងស្រស់ស្អាត! 💖", bot_token=bot_token)
                 is_sent, saved_path = invitation_card.generate(text)
                 if is_sent:
-                    invitation_card.sentImage(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
+                    invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
+                    result = invitation_card.sentImage(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
+                    if result is None:
+                        invitation_card.sentMessage(chat_id=chat_id, text_message="សុំទោសផងណា៎... ម៉ាស៊ីនរបស់ខ្ញុំហាក់ដូចជាហត់នឿយបន្តិចហើយ 🐼💤 សូមរង់ចាំមួយភ្លែត ឬអាចទាក់ទងទៅកាន់ Admin ដ៏សង្ហារបស់ខ្ញុំបានបាទ៖\n\n🔗 [សម្បត្តិ រស្មី](https://t.me/sambathreasmey) ✨", bot_token=bot_token)
                 else:
-                    invitation_card.sentMessage(chat_id=chat_id, text_message="ព័ត៏មានពុំត្រឹមត្រូវ សូមព្យាយាមម្ដងទៀត 😢", bot_token=bot_token)
+                    invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
+                    invitation_card.sentMessage(chat_id=chat_id, text_message="អូហ៍! ដូចជាមានបញ្ហាបន្តិចហើយ... 🧐 ឆែកព័ត៌មានឡើងវិញបន្តិចណា៎ រួចសាកល្បងម្ដងទៀត! ✨🌸", bot_token=bot_token)
     return {"message": "success", "code": 0, "status": 0}, 200
 
 if __name__ == '__main__':

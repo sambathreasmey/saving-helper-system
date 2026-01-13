@@ -1,3 +1,4 @@
+import time
 from PIL import Image, ImageFont, ImageDraw
 import requests
 
@@ -56,20 +57,25 @@ def sentImage(chat_id, saved_path, bot_token):
     url = f'https://api.telegram.org/bot{bot_token}/sendPhoto'
     payload = {"chat_id": chat_id,}
     try:
-        waiting_message = sentMessage(chat_id=chat_id, text_message="Please wait a moment", bot_token=bot_token)
         with open(saved_path, 'rb') as photo:
             files = {'photo': photo}
             response = requests.post(url, data=payload, files=files)
-            deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
             return response.json()
     except Exception as e:
         print(f"Failed to send HTML message: {e}")
         return None
     
 def sentMessage(chat_id, text_message, bot_token):
+    action_url = f'https://api.telegram.org/bot{bot_token}/sendChatAction'
+    action_payload = {
+        "chat_id": chat_id, 
+        "action": "typing"
+    }
     url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
     payload = {"chat_id": chat_id, "text": text_message}
     try:
+        requests.post(action_url, json=action_payload)
+        time.sleep(1)
         response = requests.get(url, data=payload)
         return response.json()
     except Exception as e:
