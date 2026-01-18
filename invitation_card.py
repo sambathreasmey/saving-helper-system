@@ -18,7 +18,7 @@ def generate(invite_name) -> bool:
         max_width = 1100 # Width of the white box area
         
         # Start with a much larger font size for high-res image
-        current_font_size = 200 
+        current_font_size = 110 
         
         img = Image.open(base_img_path)
         draw = ImageDraw.Draw(img)
