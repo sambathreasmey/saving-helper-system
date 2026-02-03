@@ -1,6 +1,7 @@
 import datetime
 import os
 import threading
+import traceback
 from flask import Flask, jsonify, render_template, redirect, request, url_for, session, flash
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, DateField, SelectField, StringField,PasswordField,SubmitField
@@ -472,20 +473,58 @@ def user_login():
                 return jsonify(data)
 
 def process_invitations(chat_id, user_id, text, bot_token):
-    """Function to handle the heavy lifting in the background."""
-    invit_names = [name.strip() for name in text.splitlines() if name.strip()]
+    """Function to handle the heavy lifting in the background with debugging."""
+    print(f"🚀 [DEBUG] Starting background thread for user_id: {user_id}")
     
-    for invit_name in invit_names:
-        waiting_message = invitation_card.sentMessage(chat_id=chat_id, text_message="✨ សូមមេត្តារង់ចាំបន្តិចណា៎... 🐻‍❄️កំពុងរៀបចំជូនយ៉ាងស្រស់ស្អាត! 💖", bot_token=bot_token)
-        is_sent, saved_path = invitation_card.generate(invit_name)
-        if is_sent:
-            invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
-            result = invitation_card.sentImage(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
-            if result is None:
-                invitation_card.sentMessage(chat_id=chat_id, text_message="សុំទោសផងណា៎... ម៉ាស៊ីនរបស់ខ្ញុំហាក់ដូចជាហត់នឿយបន្តិចហើយ 🐼💤 សូមរង់ចាំមួយភ្លែត ឬអាចទាក់ទងទៅកាន់ Admin ដ៏សង្ហារបស់ខ្ញុំបានបាទ៖\n\n🔗 [សម្បត្តិ រស្មី](https://t.me/sambathreasmey) ✨", bot_token=bot_token)
-        else:
-            invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
-            invitation_card.sentMessage(chat_id=chat_id, text_message="អូហ៍! ដូចជាមានបញ្ហាបន្តិចហើយ... 🧐 ឆែកព័ត៌មានឡើងវិញបន្តិចណា៎ រួចសាកល្បងម្ដងទៀត! ✨🌸", bot_token=bot_token)
+    try:
+        invit_names = [name.strip() for name in text.splitlines() if name.strip()]
+        print(f"📝 [DEBUG] Names found to process: {invit_names}")
+        
+        for index, invit_name in enumerate(invit_names, 1):
+            print(f"🎨 [DEBUG] ({index}/{len(invit_names)}) Processing name: '{invit_name}'")
+            
+            # Initialize waiting_message as None to handle cleanup safely
+            waiting_message = None
+            
+            try:
+                # 1. Send Waiting Message
+                waiting_message = invitation_card.sentMessage(
+                    chat_id=chat_id, 
+                    text_message="✨ សូមមេត្តារង់ចាំបន្តិចណា៎... 🐻‍❄️កំពុងរៀបចំជូនយ៉ាងស្រស់ស្អាត! 💖", 
+                    bot_token=bot_token
+                )
+
+                # 2. Generate Image
+                is_sent, saved_path = invitation_card.generate(invit_name)
+                print(f"🖼️ [DEBUG] Generation result for '{invit_name}': {is_sent}, path: {saved_path}")
+
+                # 3. Handle Results
+                if is_sent:
+                    # Cleanup waiting message
+                    if waiting_message:
+                        invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
+                    
+                    # Send final image
+                    result = invitation_card.sentImage(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
+                    
+                    if result is None:
+                        print(f"❌ [DEBUG] Failed to send image for '{invit_name}' (API returned None)")
+                        invitation_card.sentMessage(chat_id=chat_id, text_message="សុំទោសផងណា៎... ម៉ាស៊ីនរបស់ខ្ញុំហាក់ដូចជាហត់នឿយបន្តិចហើយ 🐼💤 សូមរង់ចាំមួយភ្លែត ឬអាចទាក់ទងទៅកាន់ Admin ដ៏សង្ហារបស់ខ្ញុំបានបាទ៖\n\n🔗 [សម្បត្តិ រស្មី](https://t.me/sambathreasmey) ✨", bot_token=bot_token)
+                else:
+                    print(f"⚠️ [DEBUG] Logic failure in invitation_card.generate for '{invit_name}'")
+                    if waiting_message:
+                        invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
+                    invitation_card.sentMessage(chat_id=chat_id, text_message="អូហ៍! ដូចជាមានបញ្ហាបន្តិចហើយ... 🧐 ឆែកព័ត៌មានឡើងវិញបន្តិចណា៎ រួចសាកល្បងម្ដងទៀត! ✨🌸", bot_token=bot_token)
+
+            except Exception as inner_error:
+                print(f"💥 [ERROR] Failed during individual name processing ('{invit_name}'): {inner_error}")
+                traceback.print_exc() # Prints the full line-by-line error
+                
+    except Exception as outer_error:
+        print(f"🛑 [FATAL ERROR] Background thread crashed completely: {outer_error}")
+        traceback.print_exc()
+    
+    print(f"✅ [DEBUG] Thread finished for user_id: {user_id}")
 
 active_users = set()
 @app.route(f'/{bot_token}', methods=['POST'])
