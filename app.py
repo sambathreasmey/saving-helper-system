@@ -477,7 +477,7 @@ def process_invitations(chat_id, user_id, text, bot_token):
     print(f"🚀 [DEBUG] Starting background thread for user_id: {user_id}")
     
     try:
-        invit_names = [name.strip() for name in text.splitlines() if name.strip()]
+        invit_names = text.splitlines()
         print(f"📝 [DEBUG] Names found to process: {invit_names}")
         
         for index, invit_name in enumerate(invit_names, 1):
