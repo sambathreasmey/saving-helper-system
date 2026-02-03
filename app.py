@@ -539,32 +539,6 @@ def webhook():
     user_id = message['from']['id']
     text = message.get('text', '')
 
-    if text.startswith('/test'):
-        #call to invitation-trigger
-        USERNAME = "sambathreasmey"
-        REPO = "invitation-service-automation"
-        TOKEN = os.getenv('github.token')
-        EVENT_TYPE = "invitation-trigger"
-
-        url = f"https://api.github.com/repos/{USERNAME}/{REPO}/dispatches"
-
-        headers = {
-            "Authorization": f"token {TOKEN}",
-            "Accept": "application/vnd.github.v3+json"
-        }
-
-        data = {
-            "event_type": EVENT_TYPE,
-            "client_payload": {"unit": "false", "integration": "true"} # Optional extra data
-        }
-
-        response = requests.post(url, headers=headers, json=data)
-
-        if response.status_code == 204:
-            print("Action triggered successfully!")
-        else:
-            print(f"Failed: {response.status_code}, {response.text}")
-
     if text.startswith('/start'):
         active_users.add(user_id)
         invitation_card.sentMessage(chat_id=chat_id, text_message="តោះ! ចាប់ផ្ដើមរចនាទាំងអស់គ្នា... ✨ សូមមេត្តាផ្ញើឈ្មោះដែលអ្នកចង់ដាក់លើកាតមកណា៎ 🎨✍️", bot_token=bot_token)
@@ -578,8 +552,37 @@ def webhook():
     
     if user_id in active_users:
         if len(text) > 1 and text != "":
-            thread = threading.Thread(target=process_invitations, args=(chat_id, user_id, text, bot_token))
-            thread.start()
+            invitation_data = text.splitlines()
+            print(f"📝 [DEBUG] Names found to process: {invitation_data}")
+        
+            USERNAME = "sambathreasmey"
+            REPO = "invitation-service-automation"
+            TOKEN = os.getenv('github.token')
+            EVENT_TYPE = "invitation-trigger"
+
+            url = f"https://api.github.com/repos/{USERNAME}/{REPO}/dispatches"
+
+            headers = {
+                "Authorization": f"token {TOKEN}",
+                "Accept": "application/vnd.github.v3+json"
+            }
+
+            data = {
+                "event_type": EVENT_TYPE,
+                "client_payload": {
+                    "chat_id": chat_id,
+                    "invitation_data": invitation_data
+                }
+            }
+
+            response = requests.post(url, headers=headers, json=data)
+
+            if response.status_code == 204:
+                print("Action triggered successfully!")
+            else:
+                print(f"Failed: {response.status_code}, {response.text}")
+            # thread = threading.Thread(target=process_invitations, args=(chat_id, user_id, text, bot_token))
+            # thread.start()
             # invit_names = [name.strip() for name in text.splitlines() if name.strip()]
             # for invit_name in invit_names:
             #     waiting_message = invitation_card.sentMessage(chat_id=chat_id, text_message="✨ សូមមេត្តារង់ចាំបន្តិចណា៎... 🐻‍❄️កំពុងរៀបចំជូនយ៉ាងស្រស់ស្អាត! 💖", bot_token=bot_token)
