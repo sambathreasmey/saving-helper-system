@@ -495,7 +495,7 @@ def webhook():
     
     if user_id in active_users:
         if len(text) > 1 and text != "":
-            invit_names = text.splitlines()
+            invit_names = [name.strip() for name in text.splitlines() if name.strip()]
             for invit_name in invit_names:
                 waiting_message = invitation_card.sentMessage(chat_id=chat_id, text_message="✨ សូមមេត្តារង់ចាំបន្តិចណា៎... 🐻‍❄️កំពុងរៀបចំជូនយ៉ាងស្រស់ស្អាត! 💖", bot_token=bot_token)
                 is_sent, saved_path = invitation_card.generate(invit_name)
