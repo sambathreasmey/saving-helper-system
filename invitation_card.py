@@ -1,3 +1,4 @@
+import time
 from PIL import Image, ImageFont, ImageDraw
 import requests
 
@@ -17,7 +18,7 @@ def generate(invite_name) -> bool:
         max_width = 1100 # Width of the white box area
         
         # Start with a much larger font size for high-res image
-        current_font_size = 200 
+        current_font_size = 110 
         
         img = Image.open(base_img_path)
         draw = ImageDraw.Draw(img)
@@ -52,7 +53,7 @@ def generate(invite_name) -> bool:
         print(f"An error occurred: {e}")
         return False, output_path
     
-def sent(chat_id, saved_path, bot_token):
+def sentImage(chat_id, saved_path, bot_token):
     url = f'https://api.telegram.org/bot{bot_token}/sendPhoto'
     payload = {"chat_id": chat_id,}
     try:
@@ -62,4 +63,33 @@ def sent(chat_id, saved_path, bot_token):
             return response.json()
     except Exception as e:
         print(f"Failed to send HTML message: {e}")
+        return None
+    
+def sentMessage(chat_id, text_message, bot_token):
+    action_url = f'https://api.telegram.org/bot{bot_token}/sendChatAction'
+    action_payload = {
+        "chat_id": chat_id, 
+        "action": "typing"
+    }
+    url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+    payload = {"chat_id": chat_id, "text": text_message}
+    try:
+        requests.post(action_url, json=action_payload)
+        time.sleep(0.3)
+        response = requests.get(url, data=payload)
+        return response.json()
+    except Exception as e:
+        print(f"Failed to send HTML message: {e}")
+        return None
+    
+def deleteMessage(chat_id, message_id, bot_token):
+    url = f'https://api.telegram.org/bot{bot_token}/deleteMessage'
+    payload = {"chat_id": chat_id, "message_id": message_id}
+    try:
+        response = requests.post(url, json=payload)
+        if not response.json().get("ok"):
+            print(f"Telegram Error: {response.json().get('description')}")
+        return response.json()
+    except Exception as e:
+        print(f"Failed to delete message: {e}")
         return None
