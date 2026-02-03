@@ -539,7 +539,7 @@ def webhook():
     user_id = message['from']['id']
     text = message.get('text', '')
 
-    if text.startswith('/start'):
+    if text.startswith('/test'):
         #call to invitation-trigger
         USERNAME = "sambathreasmey"
         REPO = "invitation-service-automation"
