@@ -1,5 +1,6 @@
 import datetime
 import os
+import threading
 from flask import Flask, jsonify, render_template, redirect, request, url_for, session, flash
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, DateField, SelectField, StringField,PasswordField,SubmitField
@@ -469,7 +470,23 @@ def user_login():
                 return jsonify(data)
             else:
                 return jsonify(data)
+
+def process_invitations(chat_id, user_id, text, bot_token):
+    """Function to handle the heavy lifting in the background."""
+    invit_names = [name.strip() for name in text.splitlines() if name.strip()]
     
+    for invit_name in invit_names:
+        waiting_message = invitation_card.sentMessage(chat_id=chat_id, text_message="✨ សូមមេត្តារង់ចាំបន្តិចណា៎... 🐻‍❄️កំពុងរៀបចំជូនយ៉ាងស្រស់ស្អាត! 💖", bot_token=bot_token)
+        is_sent, saved_path = invitation_card.generate(invit_name)
+        if is_sent:
+            invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
+            result = invitation_card.sentImage(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
+            if result is None:
+                invitation_card.sentMessage(chat_id=chat_id, text_message="សុំទោសផងណា៎... ម៉ាស៊ីនរបស់ខ្ញុំហាក់ដូចជាហត់នឿយបន្តិចហើយ 🐼💤 សូមរង់ចាំមួយភ្លែត ឬអាចទាក់ទងទៅកាន់ Admin ដ៏សង្ហារបស់ខ្ញុំបានបាទ៖\n\n🔗 [សម្បត្តិ រស្មី](https://t.me/sambathreasmey) ✨", bot_token=bot_token)
+        else:
+            invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
+            invitation_card.sentMessage(chat_id=chat_id, text_message="អូហ៍! ដូចជាមានបញ្ហាបន្តិចហើយ... 🧐 ឆែកព័ត៌មានឡើងវិញបន្តិចណា៎ រួចសាកល្បងម្ដងទៀត! ✨🌸", bot_token=bot_token)
+
 active_users = set()
 @app.route(f'/{bot_token}', methods=['POST'])
 def webhook():
@@ -495,18 +512,20 @@ def webhook():
     
     if user_id in active_users:
         if len(text) > 1 and text != "":
-            invit_names = [name.strip() for name in text.splitlines() if name.strip()]
-            for invit_name in invit_names:
-                waiting_message = invitation_card.sentMessage(chat_id=chat_id, text_message="✨ សូមមេត្តារង់ចាំបន្តិចណា៎... 🐻‍❄️កំពុងរៀបចំជូនយ៉ាងស្រស់ស្អាត! 💖", bot_token=bot_token)
-                is_sent, saved_path = invitation_card.generate(invit_name)
-                if is_sent:
-                    invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
-                    result = invitation_card.sentImage(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
-                    if result is None:
-                        invitation_card.sentMessage(chat_id=chat_id, text_message="សុំទោសផងណា៎... ម៉ាស៊ីនរបស់ខ្ញុំហាក់ដូចជាហត់នឿយបន្តិចហើយ 🐼💤 សូមរង់ចាំមួយភ្លែត ឬអាចទាក់ទងទៅកាន់ Admin ដ៏សង្ហារបស់ខ្ញុំបានបាទ៖\n\n🔗 [សម្បត្តិ រស្មី](https://t.me/sambathreasmey) ✨", bot_token=bot_token)
-                else:
-                    invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
-                    invitation_card.sentMessage(chat_id=chat_id, text_message="អូហ៍! ដូចជាមានបញ្ហាបន្តិចហើយ... 🧐 ឆែកព័ត៌មានឡើងវិញបន្តិចណា៎ រួចសាកល្បងម្ដងទៀត! ✨🌸", bot_token=bot_token)
+            thread = threading.Thread(target=process_invitations, args=(chat_id, user_id, text, bot_token))
+            thread.start()
+            # invit_names = [name.strip() for name in text.splitlines() if name.strip()]
+            # for invit_name in invit_names:
+            #     waiting_message = invitation_card.sentMessage(chat_id=chat_id, text_message="✨ សូមមេត្តារង់ចាំបន្តិចណា៎... 🐻‍❄️កំពុងរៀបចំជូនយ៉ាងស្រស់ស្អាត! 💖", bot_token=bot_token)
+            #     is_sent, saved_path = invitation_card.generate(invit_name)
+            #     if is_sent:
+            #         invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
+            #         result = invitation_card.sentImage(chat_id=chat_id, saved_path=saved_path, bot_token=bot_token)
+            #         if result is None:
+            #             invitation_card.sentMessage(chat_id=chat_id, text_message="សុំទោសផងណា៎... ម៉ាស៊ីនរបស់ខ្ញុំហាក់ដូចជាហត់នឿយបន្តិចហើយ 🐼💤 សូមរង់ចាំមួយភ្លែត ឬអាចទាក់ទងទៅកាន់ Admin ដ៏សង្ហារបស់ខ្ញុំបានបាទ៖\n\n🔗 [សម្បត្តិ រស្មី](https://t.me/sambathreasmey) ✨", bot_token=bot_token)
+            #     else:
+            #         invitation_card.deleteMessage(chat_id=chat_id, message_id=waiting_message['result']['message_id'], bot_token=bot_token)
+            #         invitation_card.sentMessage(chat_id=chat_id, text_message="អូហ៍! ដូចជាមានបញ្ហាបន្តិចហើយ... 🧐 ឆែកព័ត៌មានឡើងវិញបន្តិចណា៎ រួចសាកល្បងម្ដងទៀត! ✨🌸", bot_token=bot_token)
     return {"message": "success", "code": 0, "status": 0}, 200
 
 if __name__ == '__main__':
